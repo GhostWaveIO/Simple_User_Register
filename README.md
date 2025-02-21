@@ -88,7 +88,7 @@ O sistema conta com um local dedicado para pesquisar usuários cadastrados.
 3. **Editor de Formulário** (Personalização de grupos, linhas e campos)
 ![Image](https://github.com/user-attachments/assets/f4572677-a8f1-410b-bc26-b60c4f5f732a)
    
-4. **Gerenciamento de Permissões** (Define quem pode acessar cada Home)
+4. **Gerenciamento de Permissões** (Define permissões de acesso)
 ![Image](https://github.com/user-attachments/assets/bf65da96-0124-4692-994d-6d725417f97c)
 
 ## 💪 Contribuição
@@ -96,7 +96,7 @@ Sinta-se à vontade para contribuir com melhorias!
 
 1. **Clone o repositório:**
    ```sh
-   git clone https://github.com/seu-usuario/SUR.git
+   git clone https://github.com/GhostWaveIO/Simple_User_Register.git
    ```
 2. **Crie uma branch:**
    ```sh
