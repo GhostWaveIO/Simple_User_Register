@@ -1,0 +1,29 @@
+﻿
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts;
+@{ 
+    ViewData["Title"] = "Consultar Código de Usuário";
+}
+
+
+<div class="container">
+  @Html.Raw(AlertMessage.GetMessage((string)ViewData["msgResult"]))
+
+    <h4 class="text-center my-5">Consultar Código de Usuário</h4>
+
+  <div class="row">
+    <div class="col-2 col-sm-3 col-md-4 col-xl-5"></div>
+    <div class="col-8 col-sm-6 col-md-4 col-xl-2">
+      <form asp-action="ResultadoConsulta" method="post">
+
+        <div class="form-group mb-5">
+                    <Label class="d-block text-center" for="iMatricula">Digite o Número do Código de Usuário</Label>
+          <input type="text" class="form-control" name="codigo" value="" required />
+        </div>
+
+        <p class="text-center"><input class="btn btn-success" type="submit" value="Consultar" /></p>
+
+      </form>
+    </div>
+    <div class="col-2 col-sm-3 col-md-4 col-xl-5"></div>
+  </div>
+</div>

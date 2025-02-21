@@ -1,0 +1,44 @@
+﻿@using Cadastro.Models.ViewModel.Account.Cadastro.Campo
+@model CriarCampoVM
+@{
+  ViewData["Title"] = "Modelo do Campo";
+  SelectList SLAutorizadoEditar = (SelectList)ViewData["SLAutorizadoEditar"];
+  SelectList SLStartCriacaoCampos = (SelectList)ViewData["SLStartCriacaoCampos"];
+  SelectList SLModelosCampos = (SelectList)ViewData["SLModelosCampos"];
+  SelectList SLDirecaoItens = (SelectList)ViewData["SLDirecaoItens"];
+}
+
+<h4 class="text-center mt-3 mb-5">@ViewData["Title"]</h4>
+
+<form asp-action="AplicarModeloCampo" asp-controller="Cadastro" method="post">
+  <div class="row">
+    <div class="col-2"></div>
+    <div class="col-8">
+
+      @Html.HiddenFor(m => m.campo.Linha_CadastroId)
+
+
+      <h4 class="mt-5">Modelo</h4>
+
+      <!-- Modelo do Campo -->
+      <div class="form-group">
+        @Html.LabelFor(m => m.campo.ModeloCampo_Nullable)
+        @Html.DropDownListFor(m =>
+          m.campo.ModeloCampo_Nullable,
+          SLModelosCampos,
+          "Selecione uma Opção",
+          new { @class = "form-control" }
+        )
+        @Html.ValidationMessageFor(m => m.campo.ModeloCampo, "", new { @class = "text-danger" })
+      </div>
+
+
+      <p class="mt-5">
+        <input class="btn btn-primary" type="submit" value="Aplicar Modelo" />
+        <a asp-action="Index" asp-controller="Configuracao" class="btn btn-outline-secondary">Voltar</a>
+      </p>
+
+    </div>
+    <div class="col-2"></div>
+  </div>
+</form>

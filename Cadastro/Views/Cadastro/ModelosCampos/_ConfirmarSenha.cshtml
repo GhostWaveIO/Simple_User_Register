@@ -1,0 +1,61 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Account.Cadastro.Dados
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+@using Cadastro.Models.Entities.DB.Account.Form;
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+  List<Grupo_Cadastro> grupos = Model.grupos;
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+  Dado_Cadastro dadoSenha = null;
+
+  //Pesquisar entre os dados o index da Senha para usar tanto senha como Confirmar senha o mesmo dados
+  for (int gp=0;gp<grupos.Count();gp++) {
+    if(dadoSenha != null) break;
+
+    for (int lp=0;lp<grupos[gp].Linhas.Count();lp++) {
+      if (dadoSenha != null) break;
+
+      for (int cp=0;cp<grupos[gp].Linhas[lp].Campos.Count();cp++) {
+        if (dadoSenha != null) break;
+
+        if(grupos[gp].Linhas[lp].Campos[cp].CampoGenerico == ECampoGenerico.Senha) {
+          g = gp;
+          l = lp;
+          c = cp;
+          dadoSenha = grupos[gp].Linhas[lp].Campos[cp].Dados[0];
+        }
+      }
+    }
+  }
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+}
+
+<div class="@colsBootstrap form-group">
+  <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].ConfirmarSenha" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+  
+    <div class="input-group" id="show_hide_confirm_password">
+        <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].ConfirmarSenha" class="form-control" type="password" placeholder="@campo.PlaceHolder" value="" />
+        <div class="input-group-append">
+            <span class="input-group-text">
+                <a href=""><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
+            </span>
+        </div>
+    </div>
+
+  @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].ConfirmarSenha, "", new { @class = "text-danger" })
+</div>

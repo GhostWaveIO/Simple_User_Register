@@ -1,0 +1,46 @@
+﻿@using Cadastro.Models.ViewModel.Account.Cadastro.Linha;
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts;
+@model EditarLinhaVM
+@{
+    ViewData["Title"] = "Editar Linha";
+    string msgResult = (string)ViewData["msgResult"];
+}
+
+@Html.Raw(AlertMessage.GetMessage(msgResult))
+
+<h4 class="text-center mt-3 mb-5">@ViewData["Title"]</h4>
+
+<form asp-action="EditarLinha" asp-controller="Cadastro" method="post">
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+
+            @Html.HiddenFor(m => m.linha.Grupo_CadastroId)
+            @Html.HiddenFor(m => m.linha.Linha_CadastroId)
+
+            <!-- Id -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.linha.Linha_CadastroId)
+                @Html.TextBoxFor(m => m.linha.Linha_CadastroId, "", new { @class = "form-control", @disabled = "disabled" })
+            </div>
+
+            <!-- Ordem -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.linha.Ordem)
+                @Html.TextBoxFor(m => m.linha.Ordem, "", new { @class = "form-control", @placeholder = "Informe a ordem da linha" })
+                @Html.ValidationMessageFor(m => m.linha.Ordem, "", new { @class = "text-danger" })
+            </div>
+
+
+            <p class="mt-5">
+                <input class="btn btn-primary" type="submit" value="Salvar Alterações" />
+                @if (!Model.linha.IsGenerico()) {
+                    <a asp-action="ImportarCampo" asp-controller="Cadastro" asp-route-id="@Model.linha.Linha_CadastroId" class="btn btn-outline-success">Importar Campo</a>
+                }
+                <a asp-action="Index" asp-controller="Configuracao" class="btn btn-outline-secondary">Voltar</a>
+            </p>
+
+        </div>
+        <div class="col-2"></div>
+    </div>
+</form>

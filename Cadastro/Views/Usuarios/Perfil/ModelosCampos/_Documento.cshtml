@@ -1,0 +1,46 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Perfil == 0 ? $" col-{campo.ColunasXS_Cadastro}" : $" col-{campo.ColunasXS_Perfil}"),
+    (campo.ColunasSM_Perfil == 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : $" col-sm-{campo.ColunasSM_Perfil}"),
+    (campo.ColunasMD_Perfil == 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : $" col-md-{campo.ColunasMD_Perfil}"),
+    (campo.ColunasLG_Perfil == 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : $" col-lg-{campo.ColunasLG_Perfil}"),
+    (campo.ColunasXL_Perfil == 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : $" col-xl-{campo.ColunasXL_Perfil}")
+  );
+
+  string path = $"/Files/Cadastro/Documentos/{campo.Campo_CadastroId}/{campo.Dados[0].Local}";
+  string urlDocumento = Url.Content(path);
+  string download = $"{campo.Label}{System.IO.Path.GetExtension(campo.Dados[0].Local)}";
+}
+
+<div class="form-group@(colsBootstrap)">
+	<input type="hidden" class="file-required" value="@((campo.Required && String.IsNullOrEmpty(campo.Dados[0].Local)).ToString().ToLower())" />
+	<input type="hidden" class="file-extensions" value="@campo.FormatosArquivo" />
+	@*<input type="hidden" class="h-documento-max-size" value="@campo.Max" />*@
+	<input type="hidden" class="file-max-size" value="5242880" />
+	@*5MB (1MB = 1048576)*@
+
+
+	<div>
+		<label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Documento" class="mb-1@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label@Html.Raw(campo.Required? "<span class=\"text-danger\">*</span>" : "")</label>
+		@if (!String.IsNullOrEmpty(campo.Dados[0].Local)) { 
+			<p class="mt-0 mb-1 p-0"><a href="@urlDocumento" download="@download" target="_blank" class="btn btn-sm btn-secondary">Baixar</a></p>
+		}
+		<input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Documento" extensions-accept="@campo.FormatosArquivo" class="form-control-file file-input@(await campo.Dados[0].VerificarAutorizacaoEdicao(Model.usuario, acesso)?"":" disabled")" type="file" value="" />
+		<span class="text-danger file-msg"></span>
+	</div>
+</div>

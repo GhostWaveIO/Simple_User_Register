@@ -1,0 +1,42 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+
+}
+
+
+<div class="@colsBootstrap form-group">
+  @if (campo.CampoGenerico == ECampoGenerico.Email) {
+    <input hidden="hidden" asp-for="grupos[0].Linhas[0].Campos[0].Dados[0].Dado_CadastroId_Email" value="@campo.Dados[0].Dado_CadastroId">
+    <label asp-for="grupos[0].Linhas[0].Campos[0].Dados[0].Email_Generico" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+    <input asp-for="grupos[0].Linhas[0].Campos[0].Dados[0].Email_Generico" class="form-control" placeholder="@campo.PlaceHolder" value="" />
+    @Html.ValidationMessageFor(m => m.grupos[0].Linhas[0].Campos[0].Dados[0].Email_Generico, "", new { @class = "text-danger" })
+  } else if (campo.Required) {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Email_Required" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+    <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Email_Required" class="form-control" placeholder="@campo.PlaceHolder" value="" />
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Email_Required, "", new { @class = "text-danger" })
+  } else {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Email" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label</label>
+    <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Email" class="form-control" placeholder="@campo.PlaceHolder" value="" />
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Email, "", new { @class = "text-danger" })
+  }
+</div>

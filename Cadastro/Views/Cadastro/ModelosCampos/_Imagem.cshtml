@@ -1,0 +1,42 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+}
+
+<div class="@colsBootstrap form-group">
+  <input type="hidden" class="file-required" value="@campo.Required.ToString().ToLower()" />
+  <input type="hidden" class="file-extensions" value="@campo.FormatosArquivo" />
+  <input type="hidden" class="file-max-size" value="2621440" />@*2,5MB (1MB = 1048576)*@
+
+
+  <div>
+    @if (campo.Required) {
+      <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Imagem" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+      <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Imagem" extensions-accept="@campo.FormatosArquivo" class="form-control-file file-input" type="file" value="" />
+    } else {
+      <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Imagem" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label</label>
+      <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Imagem" extensions-accept="@campo.FormatosArquivo" class="form-control-file file-input" type="file" value="" />
+    }
+    <span class="text-danger file-msg"></span>
+  </div>
+</div>

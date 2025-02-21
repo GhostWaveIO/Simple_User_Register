@@ -1,0 +1,46 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.Entities.DB.Account.Form.Seletores
+@using Cadastro.Models.ViewModel.Account.Cadastro
+@using Cadastro.Models.ViewModel.Application.AccessContext
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+  string requiredField = (campo.Required?$" required-field-check" :"");
+
+  int cCampo = 0;
+}
+
+<div class="form-group@(colsBootstrap)@(requiredField)">
+  <label class="mb-1@(String.IsNullOrEmpty(campo.Label)?" d-none":" d-block")">@campo.Label@Html.Raw(campo.Required?"<span class=\"text-danger\">*</span>":"")</label>
+  @foreach (CheckBox_Item check in campo.CheckBoxes) {
+    @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].CheckBoxes[cCampo].CheckBox_ItemId)
+    <div class="form-check@(campo.DirecaoEixo == EDirecaoEixo.Horizontal?"-inline":"")">
+      @if (campo.Required) {
+        @Html.CheckBoxFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].CheckBoxes[cCampo].Checked, new { @class = $"form-check-input", @onclick= "checkBoxSelected(this.parentNode.parentNode)", @id = $"check-{check.CheckBox_ItemId}", @errorMessage = "Campo obrigatório" })
+        <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].CheckBoxes[cCampo].Checked" class="form-check-label" for="@($"check-{check.CheckBox_ItemId}")">@Html.Raw(check.Nome)</label>
+      } else {
+        @Html.CheckBoxFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].CheckBoxes[cCampo].Checked, new { @class = "form-check-input", @id = $"check-{check.CheckBox_ItemId}", @errorMessage = "Campo obrigatório" })
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].CheckBoxes[cCampo].Checked" class="form-check-label" for="@($"check-{check.CheckBox_ItemId}")">@Html.Raw(check.Nome)</label>
+      }
+    </div>
+    cCampo++;
+  }
+  @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].CheckBoxes[cCampo].Checked, "", new { @class = "text-danger d-block required-validation-check" })
+
+</div>

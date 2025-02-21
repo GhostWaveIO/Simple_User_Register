@@ -1,0 +1,35 @@
+﻿@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.ViewModel.Account.Cadastro.Linha
+@model ImportarCampoVM
+
+@{
+    ViewData["Title"] = "Importar Campo";
+    List<Campo_Cadastro> campos = (List<Campo_Cadastro>)ViewData["campos"];
+    campos.ForEach(cmp => cmp.Nome = $"{(cmp.Generico ? "-" : "")}{cmp.Nome}");
+    SelectList SLCampos = new SelectList(campos, nameof(Campo_Cadastro.Campo_CadastroId), nameof(Campo_Cadastro.Nome));
+}
+
+<h4 class="text-center">@ViewData["Title"]</h4>
+
+<form asp-action="ImportarCampo" asp-controller="Cadastro" method="post">
+    <div class="row">
+        <div class="col-0 col-md-2"></div>
+        <div class="col-0 col-md-8">
+            @Html.HiddenFor(m => m.linha.Linha_CadastroId)
+
+            @* Campo a ser importado *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.novoCampo.Campo_CadastroId)
+                @Html.DropDownListFor(m => m.novoCampo.Campo_CadastroId, SLCampos, "Selecione uma opção", new{ @class="form-control"})
+                @Html.ValidationMessageFor(m => m.novoCampo.Campo_CadastroId)
+            </div>
+
+            <p class="mt-5">
+                <input class="btn btn-success" type="submit" value="Importar" />
+                <a asp-action="EditarLinha" asp-controller="Cadastro" asp-route-id="@Model.linha.Linha_CadastroId" class="btn btn-outline-secondary">Voltar</a>
+            </p>
+
+        </div>
+        <div class="col-0 col-md-2"></div>
+    </div>
+</form>

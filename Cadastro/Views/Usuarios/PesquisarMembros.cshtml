@@ -1,0 +1,102 @@
+﻿@model PesquisarUsuarios
+@using Cadastro.Models.Account
+@using Cadastro.Models.Entities.DB.Account
+@using Cadastro.Models.ViewModel
+@using Cadastro.Models
+@using Cadastro.Models.ViewModel.Account
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro;
+@using Cadastro.Models.Services.Account;
+@using Cadastro.Models.ViewModel.Account.Search;
+
+@{
+    ViewData["Title"] = "Pesquisar Usuários";
+    List<Usuario> listaUsuarios = await Model.GetResultado();
+    AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+    SelectList SLHierarquias = (SelectList)ViewData["SLHierarquias"];
+    SelectList SLFaturaVencida = (SelectList)ViewData["SLFaturaVencida"];
+    string colFuncao = (false ? "col-12 col-md-4" : "offset-md-1 col-12 col-md-10");
+}
+
+
+@*<h4 class="text-center mt-3 mb-4">Usuários</h4>*@
+
+<div class="container">
+    <h6 class="text-center mt-3 mb-4">Pesquisar Usuários</h6>
+    <form asp-action="Index" class="mt-3" method="post">
+
+        <div class="row">
+            <!-- Permissão -->
+            <div class="form-group @colFuncao">
+                <label asp-for="HierarquiaId">Permissão</label>
+                <select class="form-control form-control-sm" asp-for="HierarquiaId" asp-items="SLHierarquias">
+                    <option value="@null">Todos</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group text-center mt-4">
+            @Html.TextBoxFor(m => m.Pesquisa, null, new { @class = "form-control-lg d-inline-block", @placeholder = "Pesquisa" })
+            <input type="submit" class="btn-lg btn-dark d-inline-block" value="Pesquisar" placeholder="Pesquisa">
+        </div>
+
+    </form>
+
+    @* Resultado da pesquisa *@
+    <div class="container">
+        <div class="row">
+            <div class="col-0 col-lg-1 col-xl-0"></div>
+            <div class="col-12 col-lg-10 col-xl-12">
+                @* Grid de seleção de páginas *@
+                @Html.Raw(((UsuariosVM)ViewData["UserVM"]).GeraGridPaginaPesquisa(Model, Url/*.Action("Index", "Usuarios", Model)*/))
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th hidden="hidden" class="text-center">Foto</th>
+                            <th class="text-center">Código de Usuário</th>
+                            <th class="text-center d-none d-md-table-cell">E-mail</th>
+                            <th class="text-center">Nome</th>
+                            <th class="text-center d-none d-xl-table-cell">Estado</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            string urlImg;
+                        }
+                        @foreach (Usuario u in listaUsuarios) {
+                            urlImg = "~/Imagens/Usuario.png";
+                            <tr>
+                                <td hidden="hidden" class="text-center"><img style="height: 35px;" class="dinline" src="@Url.Content(urlImg)"></td>
+                                <td class="text-center">@u.CodigoUsuario</td>
+                                <td class="text-center d-none d-md-table-cell">@u.GetEmail</td>
+                                <td class="text-center">@u.GetNome</td>
+                                <td class="text-center d-none d-xl-table-cell">@u.GetEstado</td>
+                                <td class="text-center">
+                                    
+                                    @if (acesso._permissao.EditarDadosUsuarios) {
+                                        <a title="Perfil" asp-action="Perfil" asp-route-usuarioResult="@u.UsuarioId" class="icon-caneta"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="id-badge" class="svg-inline--fa fa-id-badge fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M336 0H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48zM144 32h96c8.8 0 16 7.2 16 16s-7.2 16-16 16h-96c-8.8 0-16-7.2-16-16s7.2-16 16-16zm48 128c35.3 0 64 28.7 64 64s-28.7 64-64 64-64-28.7-64-64 28.7-64 64-64zm112 236.8c0 10.6-10 19.2-22.4 19.2H102.4C90 416 80 407.4 80 396.8v-19.2c0-31.8 30.1-57.6 67.2-57.6h5c12.3 5.1 25.7 8 39.8 8s27.6-2.9 39.8-8h5c37.1 0 67.2 25.8 67.2 57.6v19.2z"></path></svg></a>
+                                    }&nbsp;
+                                    @if (acesso._permissao.VisualizarDadosUsuarios) {
+                                        <a title="Dados do Usuário" asp-action="DadosUsuario" asp-route-usuarioResult="@u.UsuarioId" class="icon-caneta">
+                                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="file-invoice" class="svg-inline--fa fa-file-invoice fa-w-12" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M288 256H96v64h192v-64zm89-151L279.1 7c-4.5-4.5-10.6-7-17-7H256v128h128v-6.1c0-6.3-2.5-12.4-7-16.9zm-153 31V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zM64 72c0-4.42 3.58-8 8-8h80c4.42 0 8 3.58 8 8v16c0 4.42-3.58 8-8 8H72c-4.42 0-8-3.58-8-8V72zm0 64c0-4.42 3.58-8 8-8h80c4.42 0 8 3.58 8 8v16c0 4.42-3.58 8-8 8H72c-4.42 0-8-3.58-8-8v-16zm256 304c0 4.42-3.58 8-8 8h-80c-4.42 0-8-3.58-8-8v-16c0-4.42 3.58-8 8-8h80c4.42 0 8 3.58 8 8v16zm0-200v96c0 8.84-7.16 16-16 16H80c-8.84 0-16-7.16-16-16v-96c0-8.84 7.16-16 16-16h224c8.84 0 16 7.16 16 16z"></path></svg>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+
+                    </tbody>
+                </table>
+                @* Grid de seleção de páginas *@
+                @Html.Raw(((UsuariosVM)ViewData["UserVM"]).GeraGridPaginaPesquisa(Model, Url/*.Action("Index", "Usuarios", Model)*/))
+                @if (listaUsuarios.Count() == 0) {
+                    <p class="text-center">Nenhum Resultado Encontrado.</p>
+                }
+            </div>
+            <div class="col-0 col-lg-1 col-xl-0"></div>
+        </div>
+    </div>
+</div>

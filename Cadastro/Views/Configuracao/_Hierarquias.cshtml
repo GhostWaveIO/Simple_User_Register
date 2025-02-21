@@ -1,0 +1,43 @@
+﻿@model ConfiguracaoVM
+@using Cadastro.Models.Services.Application.Security.Autorizacao
+@using Cadastro.Models.ViewModel.Application.AccessContext
+@using Cadastro.Models.ViewModel.Application.Settings.Configurations;
+
+@{
+    AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+}
+
+@if (acesso._permissao.ManipularHierarquias) {
+    <div class="container mt-3 px-3 pb-3">
+        <h4 class="mb-4">Permissões</h4>
+
+        <table class="shadow table table-sm border">
+            <thead>
+                <tr>
+                    <th class="text-center">Nome</th>
+                    <th class="text-center">Opções</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (Hierarquia h in Model.listaHierarquias) {
+                    <tr>
+                        <td class="text-center
+                            @(Html.Raw(h.HierarquiaId==1 || h.HierarquiaId==2 ?" font-weight-bolder":""))
+                            @(Html.Raw(h.HierarquiaId==1 ?" font-italic":""))
+                            @(Html.Raw(h.PermissaoHierarquia.SomenteAdminPrincipal ?" text-danger":""))">
+                            @(h.Titulo)(@(h.HierarquiasUsuario.Count()))
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-sm font-weight-bolder btn-dark" asp-action="Descer" asp-controller="Hierarquia" asp-route-id="@h.HierarquiaId">Descer</a>
+                            <a class="btn btn-sm font-weight-bolder btn-dark" asp-action="Subir" asp-controller="Hierarquia" asp-route-id="@h.HierarquiaId">Subir</a>
+                            <a class="btn btn-sm font-weight-bolder btn-outline-secondary" asp-action="EditarHierarquia" asp-controller="Hierarquia" asp-route-id="@h.HierarquiaId">Editar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p class="text-right mb-0"><a asp-action="NovaHierarquia" asp-controller="Hierarquia" class="btn btn-sm btn-outline-primary">Nova Permissão</a></p>
+
+    </div>
+}

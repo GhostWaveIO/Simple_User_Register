@@ -1,0 +1,347 @@
+@using Cadastro.Models.ViewModel.Application.AccessContext
+@model Cadastro.Models.ViewModel.Application.Security.Permissions.HierarquiaServiceVM
+@{
+    ViewData["Title"] = "Nova Permissão";
+    AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+}
+
+
+<div class="container">
+    <h4 class="text-center mt-3 mb-5">Nova Permissão</h4>
+
+    <form class="container" asp-action="CriarHierarquia" method="post">
+
+
+        <div class="row">
+            <div class="col-12 col-md-3"></div>
+            <div class="col-12 col-md-6">
+
+                <!-- Título do nível -->
+                <div class="form-group">
+                    <label asp-for="hierarquia.Titulo">Título</label>
+                    <input class="form-control" type="text" asp-for="hierarquia.Titulo" value="" />
+
+
+
+                    <span asp-validation-for="hierarquia.Titulo" class="text-danger"></span>
+                </div>
+                @*
+                <!-- Nível Pai(Superior) -->
+                <div class="form-group">
+                <label class="form-check-label">Nível Superior</label>
+                <select class="form-control" asp-for="hierarquia.HierarquiaSuperior.HierarquiaInferior.HierarquiaId" asp-items="@(new SelectList(Model.listaHierarquias, "HierarquiaId", "Titulo"))">
+                Selecione o nível acima
+                </select>
+                </div>
+
+                <!-- Define como primeiro nível -->
+                @if((bool)ViewData["PrimeiroNivelDisponivel"]) {//Se não houver algum Nível como primeiro nível, permitir aqui
+                <div class="form-check">
+                @Html.CheckBoxFor(m => m.hierarquia.PrimeiroNivel, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.hierarquia.PrimeiroNivel, "Primeiro Nível", new { @class = "form-check-label" })
+                </div>
+                }
+
+                <!-- Define se não terá mais níveis(Último Nível) -->
+                @if((bool)ViewData["UltimoNivelDisponivel"] && (int)ViewData["qtdHierarquias"] > 0) {
+                <div class="form-check">
+                @Html.CheckBoxFor(m => m.hierarquia.UltimoNivel, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.hierarquia.UltimoNivel, "Último Nível", new { @class = "form-check-label" })
+                </div>
+                }
+
+                <!-- Define LucroCompartilhado -->
+                <div class="form-check">
+                @Html.CheckBoxFor(m => m.hierarquia.LucroCompartilhado, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.hierarquia.LucroCompartilhado, "Lucro Compartilhado", new { @class = "form-check-label" })
+                </div>
+
+                <!-- Define NívelPassivo -->
+                <div class="form-check">
+                @Html.CheckBoxFor(m => m.hierarquia.NivelPassivo, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.hierarquia.NivelPassivo, "Nível Passivo", new { @class = "form-check-label" })
+                </div>*@
+
+            </div>
+            <div class="col-12 col-md-3"></div>
+        </div>
+        <hr />
+        @*//////////////////////////////////////////////////////////////////*@
+
+        <div id="permissoes">
+            <h4 class="text-center mb-3">Permissões</h4>
+            <h5 class="my-3">Home</h5>
+
+            <!-- #### Permissões #### -->
+            <!-- Home -->
+            <div class="row">
+                <div hidden="hidden" class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.UltimosEventos" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.UltimosEventos">Acesso a Útimos Eventos</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ContagemUsuarios" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ContagemUsuarios">Acesso a Contagem de Usuários</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome">Conteúdo da Home 1</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome2" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome2">Conteúdo da Home 2</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome3" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome3">Conteúdo da Home 3</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome4" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome4">Conteúdo da Home 4</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome5" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome5">Conteúdo da Home 5</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome6" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome6">Conteúdo da Home 6</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome7" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome7">Conteúdo da Home 7</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome8" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome8">Conteúdo da Home 8</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome9" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome9">Conteúdo da Home 9</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome10" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome10">Conteúdo da Home 10</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome11" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome11">Conteúdo da Home 11</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome12" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome12">Conteúdo da Home 12</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome13" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome13">Conteúdo da Home 13</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome14" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome14">Conteúdo da Home 14</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome15" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome15">Conteúdo da Home 15</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome16" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome16">Conteúdo da Home 16</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome17" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome17">Conteúdo da Home 17</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome18" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome18">Conteúdo da Home 18</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome19" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome19">Conteúdo da Home 19</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome20" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ConteudoHome20">Conteúdo da Home 20</label>
+                </div>
+
+            </div>
+
+            <!-- Usuários -->
+            <h5 class="mt-5 mb-3">Acesso a Outros Usuários</h5>
+            <div class="row">
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.PesquisarUsuarios" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.PesquisarUsuarios">Pesquisar Usuários</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.VisualizarDadosUsuarios" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.VisualizarDadosUsuarios">Acessar Dados de Todos</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.EditarDadosUsuarios" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.EditarDadosUsuarios">Editar Dados de Todos</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.EditarHierarquiaUsuario" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.EditarHierarquiaUsuario">Editar Permissão de Todos</label>
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.DarFuncoesUsuarios" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.DarFuncoesUsuarios">Dar Permissões a Qualquer Usuário</label>
+                </div>
+
+                <div hidden="hidden" class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ApagarUsuario" value="true" />
+                    <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ApagarUsuario">Remover Qualquer Usuário</label>
+                </div>
+            </div>
+
+            @if (acesso.IsAdmin()) {
+                <!-- Estrutura de Cadastro -->
+                <h5 class="mt-5 mb-3">Estrutura de Cadastro</h5>
+                <div class="row permissao-onlyadmin">
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.CriarGrupoCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.CriarGrupoCadastro">Criar Grupos</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.EditarGrupoCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.EditarGrupoCadastro">Editar Grupos</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.RemoverGrupoCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.RemoverGrupoCadastro">Remover Grupos</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.CriarLinhaCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.CriarLinhaCadastro">Criar Linhas</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.EditarLinhaCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.EditarLinhaCadastro">Editar Linhas</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.RemoverLinhaCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.RemoverLinhaCadastro">Remover Linhas</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.CriarCampoCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.CriarCampoCadastro">Criar Campos</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.EditarCampoGenericoCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.EditarCampoGenericoCadastro">Editar Campos Genéricos</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.EditarCampoPersonalizadoCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.EditarCampoPersonalizadoCadastro">Editar Campos Personalizados</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.RemoverCampoCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.RemoverCampoCadastro">Remover Campos</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.VisualizarEstruturaCadastro" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.VisualizarEstruturaCadastro">Visualizar Estrutura de Cadastro</label>
+                    </div>
+                </div>
+            }
+
+
+
+            @if (acesso._usuario.IsAdmin()) {
+                <!-- Configurações -->
+                <h5 class="mt-5 mb-3">Configurações</h5>
+                <div class="row permissao-onlyadmin">
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.ManipularHierarquias" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.ManipularHierarquias">Criar/Editar Permissões</label>
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.VerBotaoSuporte" value="true" />
+                        <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.VerBotaoSuporte">Ícone Suporte</label>
+                    </div>
+
+                    @*Permite somente Admin de alterar as permissões daquele usuário*@
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.SomenteAdminPrincipal" value="true" />
+                        <label class="form-check-label font-weight-bold" asp-for="hierarquia.PermissaoHierarquia.SomenteAdminPrincipal">Acesso Somente Admin</label>
+                    </div>
+                </div>
+            }
+
+            <!-- Outros -->
+            <h5 hidden="hidden" class="mt-5 mb-3">Outros</h5>
+            <div hidden="hidden" class="row">
+                @*<div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                <input class="form-check-input" type="checkbox" asp-for="hierarquia.PermissaoHierarquia.AcessoTotal" value="true" />
+                <label class="form-check-label" asp-for="hierarquia.PermissaoHierarquia.AcessoTotal">Acesso Total (Todas Permissões Acima)</label>
+                </div>
+                *@
+            </div>
+
+        </div>
+
+        <p class="mt-5">
+            <button class="btn btn-primary">Criar Nível</button>
+            <button type="button" class="btn btn-primary" onclick="ckeckAllPermissions()">Selecionar Todos</button>
+            <button type="button" class="btn btn-warning" onclick="unckeckAllPermissions()">Remover Seleção</button>
+            <a asp-action="Index" asp-controller="Configuracao" class="btn btn-outline-secondary">Voltar</a>
+        </p>
+    </form>
+
+
+    <script>
+        var checks = document.getElementById("permissoes").querySelectorAll("input[type='checkbox']");
+
+        function ckeckAllPermissions() {
+
+            for (var ch = 0; ch < checks.length; ch++) {
+                checks[ch].checked = true;
+            }
+        }
+
+        function unckeckAllPermissions() {
+
+            for (var ch = 0; ch < checks.length; ch++) {
+                checks[ch].checked = false;
+            }
+        }
+    </script>
+</div>

@@ -1,0 +1,361 @@
+﻿@model CriarCampoVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.ViewModel.Account.Cadastro.Campo
+@using Cadastro;
+@using Newtonsoft.Json
+
+@{
+    ViewData["Title"] = $"Novo Campo";
+    SelectList SLAutorizadoEditar = (SelectList)ViewData["SLAutorizadoEditar"];
+    SelectList SLStartCriacaoCampos = (SelectList)ViewData["SLStartCriacaoCampos"];
+    SelectList SLModelosCampos = (SelectList)ViewData["SLModelosCampos"];
+    SelectList SLDirecaoItens = (SelectList)ViewData["SLDirecaoItens"];
+    EModeloCampo? modelo = Model.campo.ModeloCampo;
+    CriarCampoVM ccSe_TrocarModelo = new CriarCampoVM() { campo = new Campo_Cadastro() { Linha_CadastroId = Model.campo.Linha_CadastroId } };
+    ViewData["ckeditor-simples"] = true;
+}
+
+
+<h4 class="text-center mt-3 mb-5">
+    @ViewData["Title"]<br />
+    <small>@Model.campo.ModeloCampo.ToString().Replace('_', ' ') <a asp-action="NovoCampo" asp-route-ccSe_Json="@JsonConvert.SerializeObject(ccSe_TrocarModelo)" class="btn-link">(Trocar)</a></small>
+</h4>
+
+<form asp-action="NovoCampo" asp-controller="Cadastro" method="post">
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+
+            @Html.HiddenFor(m => m.campo.Linha_CadastroId)
+            @Html.HiddenFor(m => m.campo.ModeloCampo)
+
+
+            <h4 class="mt-5">Modelo</h4>
+
+            @* Nome de Identificação *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.Nome)
+                @Html.TextBoxFor(m => m.campo.Nome, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.campo.Nome, "", new { @class = "text-danger" })
+            </div>
+
+            @* Label *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.Label)
+                @Html.TextBoxFor(m => m.campo.Label, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.campo.Label, "", new { @class = "text-danger" })
+            </div>
+
+            @* Permissão de Edição (Quem poderá editar) *@
+            @if (modelo != EModeloCampo.Html && modelo != EModeloCampo.Vídeo_Youtube && Model.campo.CampoGenerico != ECampoGenerico.Senha && Model.campo.CampoGenerico != ECampoGenerico.ConfirmarSenha && Model.campo.CampoGenerico != ECampoGenerico.Email) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.AutorizadoEditar)
+                    @Html.DropDownListFor(m => m.campo.AutorizadoEditar, SLAutorizadoEditar, "Selecione uma Opção", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.AutorizadoEditar, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Local Start do Campo *@
+            <div class="form-group">
+                <label>
+                    @switch (Model.campo.ModeloCampo) {
+                        case EModeloCampo.Html:
+                        case EModeloCampo.Vídeo_Youtube:
+                            @("Local que será Apresentado")
+                            break;
+                        default:
+                            @Html.DisplayNameFor(m => m.campo.StartCriacaoCampo)
+                            break;
+                    }
+                </label>
+                @Html.DropDownListFor(m => m.campo.StartCriacaoCampo, SLStartCriacaoCampos, "Selecione uma Opção", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.campo.StartCriacaoCampo, "", new { @class = "text-danger" })
+            </div>
+
+
+            @* #### Dados #### *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Html || Model.campo.ModeloCampo == EModeloCampo.Select || Model.campo.ModeloCampo == EModeloCampo.CheckBox || Model.campo.ModeloCampo == EModeloCampo.RadioButton) {
+                <h4 class="mt-5">Dados</h4>
+            }
+
+            @* Campo Html *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Html) {
+                <!-- Html -->
+                string ex = "Ex:\n<h3 class=\"text-center mb-3\">Título</h3>\n" +
+                "<p class=\"text-center text-primary\">Parágrafo</p>\n" +
+                "<img class=\"img-fluid\" src=\"https://domínio.com.br/imagem.jpg\">";
+
+                <div class="form-group mb-3">
+                    @Html.LabelFor(m => m.campo.Html)
+                    <textarea asp-for="campo.Html" class="form-control" rows="15" placeholder='@ex'></textarea>
+                    @Html.ValidationMessageFor(m => m.campo.Html, "", new { @class = "text-danger" })
+                </div>
+
+                <script type="text/javascript">
+                    window.onload = function () {
+                        CKEDITOR.replace('@Html.IdFor(m => m.campo.Html)');
+                    };
+                </script>
+            }
+
+            @if (Model.campo.ModeloCampo == EModeloCampo.Select || Model.campo.ModeloCampo == EModeloCampo.CheckBox || Model.campo.ModeloCampo == EModeloCampo.RadioButton) {
+                @* Itens *@
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.ItensSeletores)
+                    @Html.TextAreaFor(m => m.campo.ItensSeletores, new { @class = "form-control", @placeholder = "Informe um item por linha.\nUse a tag #p# para especificar o(s) item(ns) selecionado(s).\nMáximo 300 caracteres por linha.", @rows = "7" })
+                    @Html.ValidationMessageFor(m => m.campo.ItensSeletores, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            <h4 class="mt-5">Características</h4>
+
+            @* Ativo *@
+            <label class="mb-0 pb-0">@Html.DisplayNameFor(m => m.campo.Ativo)</label>
+            <div class="form-group">
+                <div class="form-check-inline">
+                    @Html.RadioButtonFor(m => m.campo.Ativo, true, new { @class = "form-check-input", @id = "iAtivoSim" })
+                    @Html.LabelFor(m => m.campo.Ativo, "Sim", new { @class = "form-check-label", @for = "iAtivoSim" })
+                </div>
+
+                <div class="form-check-inline">
+                    @Html.RadioButtonFor(m => m.campo.Ativo, false, new { @class = "form-check-input", @id = "iAtivoNao" })
+                    @Html.LabelFor(m => m.campo.Ativo, "Não", new { @class = "form-check-label", @for = "iAtivoNao" })
+                </div>
+            </div>
+            @Html.ValidationMessageFor(m => m.campo.Ativo, "", new { @class = "text-danger" })
+
+            @* Obrigatório *@
+            @if (Model.campo.ModeloCampo != EModeloCampo.Html && Model.campo.ModeloCampo != EModeloCampo.Vídeo_Youtube) {
+                <label class="mb-0 pb-0">@Html.DisplayNameFor(m => m.campo.Required)</label>
+                <div class="form-group">
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Required, true, new { @class = "form-check-input", @id = "iObrigatorioSim" })
+                        @Html.LabelFor(m => m.campo.Required, "Sim", new { @class = "form-check-label", @for = "iObrigatorioSim" })
+                    </div>
+
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Required, false, new { @class = "form-check-input", @id = "iObrigatorioNao" })
+                        @Html.LabelFor(m => m.campo.Required, "Não", new { @class = "form-check-label", @for = "iObrigatorioNao" })
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.campo.Required, "", new { @class = "text-danger" })
+            }
+
+            @* Único *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Texto_Longo || Model.campo.ModeloCampo == EModeloCampo.Email || Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <label class="mb-0 pb-0">@Html.DisplayNameFor(m => m.campo.Unico)</label>
+                <div class="form-group">
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Unico, true, new { @class = "form-check-input", @id = "iUnicoSim" })
+                        @Html.LabelFor(m => m.campo.Unico, "Sim", new { @class = "form-check-label", @for = "iUnicoSim" })
+                    </div>
+
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Unico, false, new { @class = "form-check-input", @id = "iUnicoNao" })
+                        @Html.LabelFor(m => m.campo.Unico, "Não", new { @class = "form-check-label", @for = "iUnicoNao" })
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.campo.Unico, "", new { @class = "text-danger" })
+            }
+
+            @* Criptografia *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Texto_Longo) {
+                <label class="mb-0 pb-0">@Html.DisplayNameFor(m => m.campo.Criptografar)</label>
+                <div class="form-group">
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Criptografar, true, new { @class = "form-check-input", @id = "iCriptografiaSim" })
+                        @Html.LabelFor(m => m.campo.Criptografar, "Sim", new { @class = "form-check-label", @for = "iCriptografiaSim" })
+                    </div>
+
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Criptografar, false, new { @class = "form-check-input", @id = "iCriptografiaNao" })
+                        @Html.LabelFor(m => m.campo.Criptografar, "Não", new { @class = "form-check-label", @for = "iCriptografiaNao" })
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.campo.Unico, "", new { @class = "text-danger" })
+            }
+
+            @if (Model.campo.ModeloCampo == EModeloCampo.Documento) {
+                @* Formatos Aceitos *@
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.FormatosArquivo_Required)
+                    @Html.TextBoxFor(m => m.campo.FormatosArquivo_Required, new { @class = "form-control", @placeholder = "Ex: pdf, doc, xml..." })
+                    @Html.ValidationMessageFor(m => m.campo.FormatosArquivo_Required, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Comprimento do texto - 250 *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.GetSetComprimentoTextoMax250)
+                    <input asp-for="campo.GetSetComprimentoTextoMax250" type="number" class="form-control" value="" />
+                    @Html.ValidationMessageFor(m => m.campo.GetSetComprimentoTextoMax250, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_Longo) {
+                @* Comprimento do texto - 3000 *@
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.GetSetComprimentoTextoMax3000)
+                    <input asp-for="campo.GetSetComprimentoTextoMax3000" type="number" class="form-control" value="" />
+                    @Html.ValidationMessageFor(m => m.campo.GetSetComprimentoTextoMax3000, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* PlaceHolder *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Texto_Longo || Model.campo.ModeloCampo == EModeloCampo.Email || Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.PlaceHolder)
+                    @Html.TextBoxFor(m => m.campo.PlaceHolder, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.PlaceHolder, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Conteúdo Preenchido *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Texto_Longo) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.TextoPreenchido)
+                    @Html.TextBoxFor(m => m.campo.TextoPreenchido, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.TextoPreenchido, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Número Preenchido *@
+            @{
+                bool numMon = (Model.campo.ModeloCampo == EModeloCampo.Número_Monetário);/*É número monetário?*/
+            }
+            @if (Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.NumeroPreenchido)
+                    @Html.TextBoxFor(m => m.campo.NumeroPreenchido, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.NumeroPreenchido, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Mínimo (Número) *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.Min)
+                    @Html.TextBoxFor(m => m.campo.Min, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.Min, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Máximo (Número) *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.Max)
+                    @Html.TextBoxFor(m => m.campo.Max, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.Max, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Direção Itens (Horizontal/Vertical) *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.CheckBox || Model.campo.ModeloCampo == EModeloCampo.RadioButton || Model.campo.ModeloCampo == EModeloCampo.MultiSelect) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.DirecaoEixo)
+                    @Html.DropDownListFor(m => m.campo.DirecaoEixo, SLDirecaoItens, "Selecione uma Opção", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.DirecaoEixo, "", new { @class = "text-danger" })
+                </div>
+            }
+
+
+            @* Colunas *@
+            <h4 class="mt-5">Colunas no Cadastro</h4>
+
+            @* Ordem - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.Ordem_Cadastro)
+                @Html.TextBoxFor(m => m.campo.Ordem_Cadastro, "", new { @class = "form-control", @placeholder = "Informe a ordem do Campo" })
+                @Html.ValidationMessageFor(m => m.campo.Ordem_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas XS - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasXS_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasXS_Cadastro, new { @class = "form-control", @placeholder = "Entre 1 e 12" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasXS_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas SM - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasSM_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasSM_Cadastro, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasSM_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas MD - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasMD_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasMD_Cadastro, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasMD_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas LG - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasLG_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasLG_Cadastro, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasLG_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas XL - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasXL_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasXL_Cadastro, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasXL_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            <h4 class="mt-5">Colunas no Perfil</h4>
+
+            @* Ordem - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.Ordem_Perfil)
+                @Html.TextBoxFor(m => m.campo.Ordem_Perfil, "", new { @class = "form-control", @placeholder = "Informe a ordem do Campo" })
+                @Html.ValidationMessageFor(m => m.campo.Ordem_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas XS - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasXS_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasXS_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasXS_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas SM - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasSM_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasSM_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasSM_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas MD - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasMD_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasMD_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasMD_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas LG - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasLG_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasLG_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasLG_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas XL - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasXL_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasXL_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasXL_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+
+            <p class="mt-5">
+                <input class="btn btn-primary" type="submit" value="Criar Campo" />
+                <a asp-action="Index" asp-controller="Configuracao" class="btn btn-outline-secondary">Voltar</a>
+            </p>
+
+        </div>
+        <div class="col-2"></div>
+    </div>
+</form>

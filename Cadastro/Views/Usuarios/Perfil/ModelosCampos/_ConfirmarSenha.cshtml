@@ -1,0 +1,52 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Account.Cadastro.Dados
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+  List<Grupo_Cadastro> grupos = Model.grupos;
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+  Dado_Cadastro dadoSenha = null;
+
+  //Pesquisar entre os dados o index da Senha para usar tanto senha como Confirmar senha o mesmo dados
+  for (int gp=0;gp<grupos.Count();gp++) {
+    if(dadoSenha != null) break;
+
+    for (int lp=0;lp<grupos[gp].Linhas.Count();lp++) {
+      if (dadoSenha != null) break;
+
+      for (int cp=0;cp<grupos[gp].Linhas[lp].Campos.Count();cp++) {
+        if (dadoSenha != null) break;
+
+        if(grupos[gp].Linhas[lp].Campos[cp].CampoGenerico == ECampoGenerico.Senha) {
+          g = gp;
+          l = lp;
+          c = cp;
+          dadoSenha = grupos[gp].Linhas[lp].Campos[cp].Dados[0];
+        }
+      }
+    }
+  }
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Perfil == 0 ? $" col-{campo.ColunasXS_Cadastro}" : $" col-{campo.ColunasXS_Perfil}"),
+    (campo.ColunasSM_Perfil == 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : $" col-sm-{campo.ColunasSM_Perfil}"),
+    (campo.ColunasMD_Perfil == 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : $" col-md-{campo.ColunasMD_Perfil}"),
+    (campo.ColunasLG_Perfil == 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : $" col-lg-{campo.ColunasLG_Perfil}"),
+    (campo.ColunasXL_Perfil == 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : $" col-xl-{campo.ColunasXL_Perfil}")
+  );
+}
+
+<div class="@colsBootstrap form-group">
+  <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].ConfirmarSenha_Perfil" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+  <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].ConfirmarSenha_Perfil" class="form-control@(await campo.Dados[0].VerificarAutorizacaoEdicao(Model.usuario, acesso)?"":" disabled")" type="password" placeholder="@campo.PlaceHolder" value="" />
+  @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].ConfirmarSenha_Perfil, "", new { @class = "text-danger" })
+</div>

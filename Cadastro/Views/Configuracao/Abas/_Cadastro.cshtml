@@ -1,0 +1,176 @@
+﻿@model ConfiguracaoVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Account.Cadastro.Campo
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Application.Settings.Configurations
+@using Newtonsoft.Json
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+  string cols = String.Empty;
+  bool linhaGenerica = false;
+  bool campoGenerico = false;
+
+  CriarCampoVM ccSe = null;
+
+  string classColunasOn = "text-white bg-primary px-1";
+  string classColunasOff = "text-white bg-secondary px-1";
+}
+
+
+<!-- Informações -->
+<div class="active tab-pane" id="cadastro">
+
+  <div class="mt-3 px-3 pb-3">
+    <h4 class="mb-0">Estrutura de Cadastro</h4>
+
+    @if (acesso._permissao.CriarGrupoCadastro) {<p class="text-right mb-0"><a asp-action="NovoGrupo" asp-controller="Cadastro" class="btn btn-sm btn-primary">Novo Grupo</a></p>}
+
+    @foreach (Grupo_Cadastro grupo in Model.listaGrupos_Cadastro.OrderBy(g => g.Ordem)) {
+
+      <div class="shadow px-3 pt-1 mt-2 border">
+        <h5 class="mt-1">
+          <span class="font-weight-bold">@grupo.Ordem</span>-@Html.Raw(grupo.Generico ? $"{grupo.Titulo} <span class=\"text-warning\">(Genérico)</span>" : grupo.Titulo)
+          @if (!grupo.Generico && acesso._permissao.RemoverGrupoCadastro) {<a href="#" onclick="removerGrupoCadastro(@grupo.Grupo_CadastroId)" class="btn btn-sm btn-outline-danger float-md-right mb-md-2 ml-3 mt-2 mt-md-0">Remover Grupo</a>}
+          @if (acesso._permissao.EditarGrupoCadastro) {<a asp-action="EditarGrupo" asp-controller="Cadastro" asp-route-id="@grupo.Grupo_CadastroId" class="btn btn-sm btn-outline-success float-md-right mb-md-2 ml-3 mt-2 mt-md-0">Editar Grupo</a>}
+          @if (acesso._permissao.CriarLinhaCadastro) {<a asp-action="NovaLinha" asp-controller="Cadastro" asp-route-id="@grupo.Grupo_CadastroId" class="btn btn-sm btn-outline-primary float-md-right mb-md-2 mt-2 mt-md-0">Nova Linha</a>}
+        </h5>
+
+
+        <div style="overflow-x: auto; clear: both;">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="text-center d-none d-lg-table-cell">Ordem</th>
+                <th class="text-center">Campos</th>
+                <th class="text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach (Linha_Cadastro linha in grupo.Linhas.OrderBy(l => l.Ordem)) {
+                linhaGenerica = linha.IsGenerico();
+                if (linhaGenerica && !linha.Campos.Any())
+                  continue;
+
+                ccSe = new CriarCampoVM() { campo = new Campo_Cadastro() { Linha_CadastroId = linha.Linha_CadastroId } };
+
+                <tr>
+                  <td class="align-middle text-center d-none d-lg-table-cell font-weight-bold">@Html.Raw(linhaGenerica ? $" <span class=\"text-warning{(linhaGenerica ? " font-weight-bold" : "")}\">{linha.Ordem} (G)</span>" : linha.Ordem.ToString())</td>
+                  <td class="p-2 align-middle text-center">
+                    <table class="table table-sm table-striped m-0 p-0">
+                      @*
+                      <thead>
+                        <tr>
+                          <td class="py-0 text-center">Nome</td>
+                          <td class="py-0 text-center d-none d-sm-table-cell">Mod.</td>
+                          <td class="py-0 text-center d-none d-md-table-cell">Colunas</td>
+                          <td class="py-0 text-center">Ações</td>
+                        </tr>
+                      </thead>
+                      *@
+                      <tbody>
+                      </tbody>
+                      @*Campos*@
+                      @foreach (Campo_Cadastro campo in linha.Campos.OrderBy(c => c.Ordem_Cadastro)) {
+                        campoGenerico = campo.Generico;
+                        cols = String.Format(
+                          "C: {0} {1} {2} {3} {4}<br/>P: {5} {6} {7} {8} {9}",
+                          $"<span class=\"{(campo.ColunasXS_Cadastro == 0 ? classColunasOff : classColunasOn)}\">XS-{campo.GetCols("xs", 'c')}</span>",//Cadastro
+                          $"<span class=\"{(campo.ColunasSM_Cadastro == 0 ? classColunasOff : classColunasOn)}\">SM-{campo.GetCols("sm", 'c')}</span>",//Cadastro
+                          $"<span class=\"{(campo.ColunasMD_Cadastro == 0 ? classColunasOff : classColunasOn)}\">MD-{campo.GetCols("md", 'c')}</span>",//Cadastro
+                          $"<span class=\"{(campo.ColunasLG_Cadastro == 0 ? classColunasOff : classColunasOn)}\">LG-{campo.GetCols("lg", 'c')}</span>",//Cadastro
+                          $"<span class=\"{(campo.ColunasXL_Cadastro == 0 ? classColunasOff : classColunasOn)}\">XL-{campo.GetCols("xl", 'c')}</span>",//Cadastro
+                          $"<span class=\"{(campo.ColunasXS_Perfil == 0 ? classColunasOff : classColunasOn)}\">XS-{campo.GetCols("xs", 'p')}</span>",//Perfil
+                          $"<span class=\"{(campo.ColunasSM_Perfil == 0 ? classColunasOff : classColunasOn)}\">SM-{campo.GetCols("sm", 'p')}</span>",//Perfil
+                          $"<span class=\"{(campo.ColunasMD_Perfil == 0 ? classColunasOff : classColunasOn)}\">MD-{campo.GetCols("md", 'p')}</span>",//Perfil
+                          $"<span class=\"{(campo.ColunasLG_Perfil == 0 ? classColunasOff : classColunasOn)}\">LG-{campo.GetCols("lg", 'p')}</span>",//Perfil
+                          $"<span class=\"{(campo.ColunasXL_Perfil == 0 ? classColunasOff : classColunasOn)}\">XL-{campo.GetCols("xl", 'p')}</span>"//Perfil
+                        );
+
+                        <tr>
+                          <td class="py-0 text-left align-middle@(campo.Ativo?"":" text-muted")"><span class="font-weight-bold">@campo.Ordem_Cadastro/@campo.Ordem_Perfil</span>-@campo.Nome@Html.Raw(campo.Generico ? " <span class=\"text-warning font-weight-bold\">(G)</span>" : "")</td>
+                          <td class="py-0 text-center align-middle@(campo.Ativo?"":" text-muted") d-none d-sm-table-cell d-lg-none">@(campo.ModeloCampo.ToString().Substring(0,3).Replace('_', ' '))..@(campo.ModeloCampo.ToString().Substring(campo.ModeloCampo.ToString().Length-2).Replace('_', ' '))</td>
+                          <td class="py-0 text-center align-middle@(campo.Ativo?"":" text-muted") d-none d-lg-table-cell">@campo.ModeloCampo.ToString().Replace('_', ' ')</td>
+                          <td class="py-0 text-center align-middle d-none d-md-table-cell" style="line-height: 13.5pt;"><small>@Html.Raw(cols)</small></td>
+                          <td class="py-0 text-right align-middle container-btn-icon w-auto w-md-25">
+                            @if ((acesso._permissao.EditarCampoGenericoCadastro && campo.Generico) || (acesso._permissao.EditarCampoPersonalizadoCadastro && !campo.Generico)) {
+                              <a title="Editar Campo" asp-action="EditarCampo" asp-controller="Cadastro" asp-route-id="@campo.Campo_CadastroId" class="icon-caneta">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil-alt" class="svg-inline--fa fa-pencil-alt fa-w-16 text-success" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                              </a>
+                            }
+                            @if (!campoGenerico && acesso._permissao.RemoverCampoCadastro) {
+                              <a title="Remover Campo" onclick="removerCampoCadastro(@campo.Campo_CadastroId)" href="#" class="icon-caneta">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-alt" class="svg-inline--fa fa-trash-alt fa-w-14 text-danger" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path></svg>
+                              </a>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </table>
+                  </td>
+                  <td class="text-center align-middle container-btn-icon">
+                    @if (!linhaGenerica && acesso._permissao.CriarCampoCadastro) {
+                      <a title="Novo Campo" href="@Url.Action("NovoCampo", "Cadastro", new{ ccSe_Json = JsonConvert.SerializeObject(ccSe) } )" class="icon-caneta">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="text-primary"><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" /></svg>
+                      </a>
+                    }
+                    @if (acesso._permissao.EditarLinhaCadastro) {
+                      <a title="Editar Linha" asp-action="EditarLinha" asp-controller="Cadastro" asp-route-id="@linha.Linha_CadastroId" class="icon-caneta">
+                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil-alt" class="svg-inline--fa fa-pencil-alt fa-w-16 text-success" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                      </a>
+                    }
+                    @if (!linhaGenerica && acesso._permissao.RemoverLinhaCadastro) {
+                      <a title="Remover Linha" onclick="removerLinhaCadastro(@linha.Linha_CadastroId)" href="#" class="icon-caneta">
+                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-alt" class="svg-inline--fa fa-trash-alt fa-w-14 text-danger" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path></svg>
+                      </a>
+                    }
+
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    }
+  </div>
+</div>
+<!-- /.tab-pane -->
+
+
+@if (acesso._permissao.RemoverGrupoCadastro) {
+  <script>
+    function removerGrupoCadastro(id) {
+      let accept = confirm("Tem certeza que deseja remover este grupo?");
+      if (accept) {
+        location.assign("@(Url.Action("RemoverGrupo", "Cadastro"))/" + id);
+      }
+    }
+  </script>
+}
+
+@if (acesso._permissao.RemoverLinhaCadastro) {
+  <script>
+    //----------------------------------------------------------------------------------------------------------------
+    function removerLinhaCadastro(id) {
+      let accept = confirm("Tem certeza que deseja remover esta linha?");
+      if (accept) {
+        location.assign("@(Url.Action("RemoverLinha", "Cadastro"))/" + id);
+      }
+    }
+  </script>
+}
+
+@if(acesso._permissao.RemoverCampoCadastro){
+  <script>
+    //----------------------------------------------------------------------------------------------------------------
+    function removerCampoCadastro(id) {
+      let accept = confirm("Tem certeza que deseja remover este campo?");
+      if (accept) {
+        location.assign("@(Url.Action("RemoverCampo", "Cadastro"))/"+id);
+      }
+    }
+  </script>
+}

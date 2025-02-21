@@ -1,0 +1,39 @@
+﻿@using Cadastro.Models.ViewModel.Account.Cadastro.Grupo
+@model EditarGrupoVM
+@{
+  ViewData["Title"] = "Editar Grupo";
+}
+
+<h4 class="text-center mt-3 mb-5">@ViewData["Title"]</h4>
+
+<form asp-action="EditarGrupo" asp-controller="Cadastro" method="post">
+  <div class="row">
+    <div class="col-2"></div>
+    <div class="col-8">
+
+      @Html.HiddenFor(m => m.grupo.Grupo_CadastroId)
+
+      <!-- Titulo -->
+      <div class="form-group">
+        @Html.LabelFor(m => m.grupo.Titulo)
+        @Html.TextBoxFor(m => m.grupo.Titulo, "", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.grupo.Titulo, "", new { @class = "text-danger" })
+      </div>
+
+      <!-- Ordem -->
+      <div class="form-group">
+        @Html.LabelFor(m => m.grupo.Ordem)
+        @Html.TextBoxFor(m => m.grupo.Ordem, "", new { @class = "form-control", @placeholder = "Informe a ordem do grupo" })
+        @Html.ValidationMessageFor(m => m.grupo.Ordem, "", new { @class = "text-danger" })
+      </div>
+
+      
+      <p class="mt-5">
+        <input class="btn btn-primary" type="submit" value="Salvar Alterações" />
+        <a asp-action="Index" asp-controller="Configuracao" class="btn btn-outline-secondary">Voltar</a>
+      </p>
+
+    </div>
+    <div class="col-2"></div>
+  </div>
+</form>

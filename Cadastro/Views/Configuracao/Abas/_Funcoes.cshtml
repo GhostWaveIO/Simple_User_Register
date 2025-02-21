@@ -1,0 +1,16 @@
+﻿@using Cadastro.Models.ViewModel.Application.Settings.Configurations;
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@model ConfiguracaoVM
+
+@{
+  ViewData["Title"] = "Configurações";
+  string msgResult = (string)ViewData["msgResult"];
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+
+}
+
+<!-- Dados Pessoais -->
+<div class="tab-pane@(!acesso._permissao.AnyEstruturaCadastro()?" active":"")" id="funcoes">
+  @await Html.PartialAsync("../_Hierarquias.cshtml")
+</div>
+<!-- FIM| Dados Pessoais -->

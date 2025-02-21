@@ -1,0 +1,126 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Account.Cadastro
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts
+
+
+@{
+    ViewData["Title"] = "Cadastro";
+    Layout = "_LayoutNoMenu";
+    List<Grupo_Cadastro> listaGrupos = (List<Grupo_Cadastro>)ViewData["grupoCadastro"];
+    List<Grupo_Cadastro> grupos = Model.grupos;
+    Campo_Cadastro campo = null;
+    string msg = AlertMessage.GetMessage(@Model.msgResult);
+}
+
+
+@*<h3 class="text-center mt-3">Criar Cadastro</h3>*@
+<!-- Alert Message -->
+@Html.Raw(msg)
+
+<form class="container" id="form-cadastro" asp-action="Cadastrar" enctype="multipart/form-data" method="post">
+  <input hidden="hidden" asp-for="Indicacao" value="@Model.Indicacao">
+
+
+  @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+  <div class="row">
+    <div class="col-0 col-lg-1"></div>
+    <div class="col-12 col-lg-10">
+
+      @for (int g = 0; g < grupos.Count(); g++) {
+
+        <h5 class="mt-5 mb-3">@grupos[g].Titulo</h5>
+
+        for (int l = 0; l < grupos[g].Linhas.Count(); l++) {
+
+          <div class="row">
+            @for (int c = 0; c < grupos[g].Linhas[l].Campos.Count(); c++) {
+              campo = grupos[g].Linhas[l].Campos[c];
+
+              @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].Campo_CadastroId)
+              @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Campo_CadastroId)
+              @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].ModeloCampo)
+              @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].CampoGenerico)
+
+              ViewData["grupos"] = grupos;
+              ViewData["g"] = g;
+              ViewData["l"] = l;
+              ViewData["c"] = c;
+
+              @* Define os formatos de arquivos *@
+              if (campo.ModeloCampo == EModeloCampo.Imagem) {
+                campo.FormatosArquivo = string.Join(", ", campo.Dados[0].formatosImagemAceitos);
+              }
+
+              switch (campo.ModeloCampo) {
+                case EModeloCampo.Texto_250:
+                  @await Html.PartialAsync("ModelosCampos/_Texto250.cshtml")
+                  break;
+                case EModeloCampo.Texto_Longo:
+                  @await Html.PartialAsync("ModelosCampos/_TextoLongo.cshtml")
+                  break;
+                case EModeloCampo.Senha:
+                  @await Html.PartialAsync("ModelosCampos/_Senha.cshtml")
+                  break;
+                case EModeloCampo.Confirmar_Senha:
+                  @await Html.PartialAsync("ModelosCampos/_ConfirmarSenha.cshtml")
+                  break;
+                case EModeloCampo.Email:
+                  @await Html.PartialAsync("ModelosCampos/_Email.cshtml")
+                  break;
+                case EModeloCampo.Número:
+                  @await Html.PartialAsync("ModelosCampos/_Numero.cshtml")
+                  break;
+                case EModeloCampo.Número_Monetário:
+                  @await Html.PartialAsync("ModelosCampos/_NumeroMonetario.cshtml")
+                  break;
+                case EModeloCampo.Select:
+                  @await Html.PartialAsync("ModelosCampos/_Select.cshtml")
+                  break;
+                case EModeloCampo.MultiSelect:
+                  @await Html.PartialAsync("ModelosCampos/_MultiSelect.cshtml")
+                  break;
+                case EModeloCampo.CheckBox:
+                  @await Html.PartialAsync("ModelosCampos/_CheckBox.cshtml")
+                  break;
+                case EModeloCampo.RadioButton:
+                  @await Html.PartialAsync("ModelosCampos/_RadioButton.cshtml")
+                  break;
+                case EModeloCampo.Imagem:
+                  @await Html.PartialAsync("ModelosCampos/_Imagem.cshtml")
+                  break;
+                case EModeloCampo.Documento:
+                  @await Html.PartialAsync("ModelosCampos/_Documento.cshtml")
+                  break;
+                case EModeloCampo.Html:
+                  @await Html.PartialAsync("ModelosCampos/_Html.cshtml")
+                  break;
+                case EModeloCampo.Vídeo_Youtube:
+                  @await Html.PartialAsync("ModelosCampos/_Texto_VideoYoutube.cshtml")
+                  break;
+              }
+            }
+          </div>
+        }
+
+      }
+
+      <p class="text-center mt-5"><input type="submit" class="btn btn-primary mt-5" id="submit" value="Criar Conta" /></p>
+    </div>
+
+    <div class="col-0 col-lg-1"></div>
+  </div>
+</form>
+
+
+<script>
+
+  //--------------------------------------------------------------------------------------------------------------------------------------------
+  $(function () {
+    $('.numero-monetario').maskMoney({ decimal: ',', thousands: '', precision: 2 });
+  })
+</script>
+
+<script src="~/js/Validations/ValidationCheckBox.js"></script>
+<script src="~/js/Validations/ValidationFile.js"></script>

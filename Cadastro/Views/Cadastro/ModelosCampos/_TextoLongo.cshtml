@@ -1,0 +1,38 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+}
+
+
+
+<div class="@colsBootstrap form-group">
+  @if (campo.Required) {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].TextoLongo_Required" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+    <textarea asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].TextoLongo_Required" class="form-control" rows="6" data-val-length="Máximo @campo.ComprimentoTextoMax caracteres" data-val-length-min="3" data-val-length-max="@campo.ComprimentoTextoMax" data-val-regex-pattern="@campo.ExpressaoRegular" placeholder="@campo.PlaceHolder">@Model.grupos[g].Linhas[l].Campos[c].Dados[0].TextoLongo</textarea>
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].TextoLongo_Required, "", new { @class = "text-danger" })
+  } else {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].TextoLongo" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label</label>
+    <textarea asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].TextoLongo" class="form-control" rows="6" data-val-length="Máximo @campo.ComprimentoTextoMax caracteres" data-val-length-min="3" data-val-length-max="@campo.ComprimentoTextoMax" data-val-regex-pattern="@campo.ExpressaoRegular" placeholder="@campo.PlaceHolder">@Model.grupos[g].Linhas[l].Campos[c].Dados[0].TextoLongo</textarea>
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].TextoLongo, "", new { @class = "text-danger" })
+  }
+</div>

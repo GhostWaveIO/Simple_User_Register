@@ -1,0 +1,43 @@
+﻿
+
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts;
+@model CadastroUsuarioVM
+@{
+  ViewData["Title"] = "Redefinir Senha";
+  string msgResult = (string)ViewData["msgResult"];
+}
+
+@Html.Raw(AlertMessage.GetMessage(msgResult))
+
+<h4 class="text-center mt-3 mb-5">Redefinir Senha</h4>
+
+<div class="row">
+  <div class="col-12 col-md-3"></div>
+  <div class="col-12 col-md-6">
+    
+    <form asp-action="NovaSenha" method="post">
+      @Html.HiddenFor(m => m.key)
+      @Html.HiddenFor(m => m.usuario.Dados[0].Campo.Campo_CadastroId)
+      @Html.HiddenFor(m => m.usuario.Dados[0].Campo.ModeloCampo)
+      @Html.HiddenFor(m => m.usuario.Dados[0].Campo.CampoGenerico)
+
+      <div class="form-group">
+        <label asp-for="usuario.Dados[0].Senha">Nova Senha</label>
+        <input class="form-control" type="Password" asp-for="usuario.Dados[0].Senha" value="" />
+        <span asp-validation-for="usuario.Dados[0].Senha" class="text-danger"></span>
+      </div>
+
+      <div class="form-group">
+        <label asp-for="usuario.Dados[0].ConfirmarSenha">Repetir Nova Senha</label>
+        <input class="form-control" type="password" asp-for="usuario.Dados[0].ConfirmarSenha" value="" />
+        <span asp-validation-for="usuario.Dados[0].ConfirmarSenha" class="text-danger"></span>
+      </div>
+
+      <button class="btn btn-primary">Redefinir Senha</button>
+    </form>
+    
+  </div>
+  <div class="col-12 col-md-3"></div>
+</div>
+

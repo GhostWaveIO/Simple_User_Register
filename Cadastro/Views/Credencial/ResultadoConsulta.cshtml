@@ -1,0 +1,60 @@
+﻿
+@using Cadastro.Models.Entities.DB.Account
+@model Usuario
+@{ 
+  ViewData["Title"] = "Resultado da Pesquisa";
+  string status = String.Empty;
+  string texto = String.Empty;
+
+  switch(Model?.Status) {
+    case (EStatus?)EStatus.Ativo:
+    case (EStatus?)EStatus.Apto:
+      status = $"<h2 class=\"text-success text-center mb-4\">Documento Apto</h2>";
+      texto = "O portador(a) deste documento está apto a adentrar em ambientes públicos para exercer assistência de capelania e religiosa gratuita e voluntária.";
+      break;
+    case (EStatus?)EStatus.Suspenso:
+      status = $"<h2 class=\"text-danger text-center mb-4\">Documento Suspenso</h2>";
+      texto = "O portador(a) deste documento não tem permissão para adentrar nos recintos públicos.";
+      break;
+    case (EStatus?)EStatus.Vencido:
+      status = $"<h2 class=\"text-danger text-center mb-4\">Documento Vencido</h2>";
+      texto = "Favor procurar a secretaria para regularização de pendências.";
+      break;
+    case null:
+      status = "<h2 class=\"text-danger text-center mb-4\">Usuário Não Encontrado</h2>";
+            texto = "Código de Usuário incorreto ou este usuário foi removido do sistema.";
+      break;
+    case (EStatus?)EStatus.Inválido:
+    default:
+      status = "<h2 class=\"text-danger text-center mb-4\">Documento Inválido</h2>";
+      texto = "O portador(a) deste documento não tem permissão. Documento Inválido e/ou Excluído.";
+      break;
+  }
+}
+
+
+<div class="container">
+  <h4 class="text-center my-5">Resultado da Consulta</h4>
+
+  <div class="row">
+    <div class="col-0 col-md-2"></div>
+    <div class="col-12 col-md-8">
+      <div class="border px-5 py-3 shadow">
+        @Html.Raw(status)
+        <p class="text-center">@texto</p>
+        @if (Model != null) {
+          <hr />
+          <p class="text-center">
+            <span class="font-weight-bolder">Primeiro Nome:</span> @Model?.GetNome<br />
+                        <span class="font-weight-bolder">Código de Usuário:</span> @Model?.CodigoUsuario?.ToUpper()<br />
+            <span class="font-weight-bolder">CPF:</span> @(Model?.GetCpf??"[Não Informado]")
+          </p>
+        }
+
+        <p class="mt-5 mb-3 text-center"><a asp-action="Consulta" class="btn btn-outline-secondary">Refazer Consulta</a></p>
+
+      </div>
+    </div>
+    <div class="col-0 col-md-2"></div>
+  </div>
+</div>

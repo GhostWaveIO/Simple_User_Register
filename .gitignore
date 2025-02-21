@@ -1,0 +1,11 @@
+.vs/*
+.vscode/*
+Cadastro/bin/*
+Cadastro/obj/*
+Cadastro/Migrations/*
+Cadastro/appsettings.Development.json
+Cadastro/appsettings.json
+Cadastro/StaticFiles/wwwroot/webmanifest.json
+Cadastro/StaticFiles/wwwroot/dbFile/*
+Cadastro/StaticFiles/wwwroot/Files/*
+Cadastro/StaticFiles/wwwroot/internal/settings/*

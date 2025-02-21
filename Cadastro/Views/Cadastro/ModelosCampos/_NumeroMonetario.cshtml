@@ -1,0 +1,47 @@
+﻿@model CadastroUsuarioVM
+@using System.Globalization
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Account.Cadastro
+@using Cadastro.Models.ViewModel.Application.AccessContext
+
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+
+  //Correção
+  if(campo.CasasDecimais <= 0) campo.CasasDecimais = 2;
+  string range = String.Format(
+    "Valor aceito entre {0} e {1}.",
+    campo.Min?.ToString("0.000000".Substring(0, 2 + campo.CasasDecimais), new CultureInfo("en-US")).Replace('.', ','),
+    campo.Max?.ToString("0.000000".Substring(0, 2 + campo.CasasDecimais), new CultureInfo("en-US")).Replace('.', ',')
+  );
+}
+
+
+<div class="form-group@(colsBootstrap)">
+  @if (campo.Required) {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].NumeroMonetario_Required" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+    <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].NumeroMonetario_Required" class="form-control numero-monetario" type="text" data-val-range="@range" data-val-range-min="@((campo.Min??int.MinValue).ToString("0.000000".Substring(0, 2+campo.CasasDecimais), new CultureInfo("en-US")))" data-val-range-max="@((campo.Max??int.MaxValue).ToString("0.000000".Substring(0, 2+campo.CasasDecimais), new CultureInfo("en-US")))" data-val-required="Campo obrigatório" placeholder="@campo.PlaceHolder" value="@Model.grupos[g].Linhas[l].Campos[c].NumeroPreenchido" />
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].NumeroMonetario_Required, "", new { @class = "text-danger" })
+  } else {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].NumeroMonetario" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label</label>
+    <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].NumeroMonetario" class="form-control numero-monetario" type="text" data-val-number="" data-val-range="@range" data-val-range-min="@((campo.Min??int.MinValue).ToString("0.000000".Substring(0, 2+campo.CasasDecimais), new CultureInfo("en-US")))" data-val-range-max="@((campo.Max??int.MaxValue).ToString("0.000000".Substring(0, 2+campo.CasasDecimais), new CultureInfo("en-US")))" placeholder="@campo.PlaceHolder" value="@Model.grupos[g].Linhas[l].Campos[c].NumeroPreenchido" />
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].NumeroMonetario, "", new { @class = "text-danger" })
+  }
+</div>

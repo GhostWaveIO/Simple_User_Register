@@ -1,0 +1,32 @@
+﻿@using Cadastro.Models.ViewModel.Account.Cadastro.Linha
+@model CriarLinhaVM
+@{
+    ViewData["Title"] = "Nova Linha";
+}
+
+<h4 class="text-center mt-3 mb-5">@ViewData["Title"]</h4>
+
+<form asp-action="NovaLinha" asp-controller="Cadastro" method="post">
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+
+            @Html.HiddenFor(m => m.linha.Grupo_CadastroId)
+
+            <!-- Ordem -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.linha.Ordem)
+                @Html.TextBoxFor(m => m.linha.Ordem, "", new { @class = "form-control", @placeholder = "Informe a ordem da linha" })
+                @Html.ValidationMessageFor(m => m.linha.Ordem, "", new { @class = "text-danger" })
+            </div>
+
+
+            <p class="mt-5">
+                <input class="btn btn-primary" type="submit" value="Criar Linha" />
+                <a asp-action="Index" asp-controller="Configuracao" class="btn btn-outline-secondary">Voltar</a>
+            </p>
+
+        </div>
+        <div class="col-2"></div>
+    </div>
+</form>

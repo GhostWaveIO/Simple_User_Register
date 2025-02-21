@@ -1,0 +1,46 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.Entities.DB.Account.Form.Seletores;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+
+}
+
+<div class="form-group@(colsBootstrap)">
+  <label class="mb-1@(String.IsNullOrEmpty(campo.Label)?" d-none":" d-block")">@campo.Label@Html.Raw(campo.Required?"<span class=\"text-danger\">*</span>":"")</label>
+  @foreach (RadioButton_Item radio in campo.RadioButtons.OrderBy(r => r.Ordem)) {
+    <div class="form-check@(campo.DirecaoEixo == EDirecaoEixo.Horizontal?"-inline":"")">
+      @if (campo.Required) {
+        @Html.RadioButtonFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].RadioButton_Checked.RadioButton_ItemId_Required, radio.RadioButton_ItemId, new { @class = "form-check-input", @id= $"radio-{radio.RadioButton_ItemId}" })
+        <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].RadioButton_Checked.RadioButton_ItemId_Required" class="form-check-label" for="@($"radio-{radio.RadioButton_ItemId}")">@radio.Nome</label>
+      } else {
+        @Html.RadioButtonFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].RadioButton_Checked.RadioButton_ItemId, radio.RadioButton_ItemId, new { @class = "form-check-input", @id = $"radio-{radio.RadioButton_ItemId}" })
+        <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].RadioButton_Checked.RadioButton_ItemId" class="form-check-label" for="@($"radio-{radio.RadioButton_ItemId}")">@radio.Nome</label>
+      }
+    </div>
+  }
+  @if (campo.Required) {
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].RadioButton_Checked.RadioButton_ItemId_Required, "", new { @class = "text-danger" })
+  } else {
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].RadioButton_Checked.RadioButton_ItemId, "", new { @class = "text-danger" })
+  }
+</div>

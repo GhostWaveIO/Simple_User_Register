@@ -1,0 +1,51 @@
+﻿@using Cadastro.Models.ViewModel.Account;
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts;
+@model UsuarioVM
+@{
+  ViewData["Title"]="Login";
+}
+
+<section class="container">
+
+  <div class="row">
+    <div class="col-0 col-md-3 col-xl-4"></div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+      <br />
+      <!-- Alert Message -->
+      @Html.Raw(AlertMessage.GetMessage(Model.msgResult))
+
+      @*<div id="caixaLogin" class="border rounded-lg p-3 mt-5 mb-3">
+
+        <h3 class="text-center mb-4">Acesso ao Painel</h3>
+
+        <form asp-action="ValidarLogin" method="post">
+
+          <div class="form-group">
+            <label asp-for="usuario.Email">Login</label>
+            <input minlength="3" type="text" asp-for="usuario.Email" class="form-control">
+          </div>
+
+          <div class="form-group mb-0">
+            <label asp-for="usuario.Senha">Senha de Acesso</label>
+            <input type="password" asp-for="usuario.Senha" class="form-control">
+          </div>
+
+          <br><button type="submit" class="btn btn-primary d-block float-left">Efetuar Login</button>
+
+
+          <small class="text-right d-block float-right">
+            <a asp-controller="Cadastro" asp-action="Index">Criar Conta</a><br>
+            <a class="text-right" href="recover/result.php">Recuperar Acesso</a>
+          </small>
+          <div style="clear: both;"></div>
+        </form>
+
+      </div>*@
+    </div>
+
+    <div class="col-0 col-md-3 col-xl-4"></div>
+  </div>
+
+</section>
+

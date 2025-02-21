@@ -1,0 +1,162 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Account.Cadastro
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts
+
+@{
+    ViewData["Title"] = "Perfil do Usuário";
+    AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+    Campo_Cadastro campo;
+    List<Grupo_Cadastro> grupos = Model.grupos;
+    Usuario usuario = (Usuario)ViewData["usuario"];
+    string msgResult = (string)ViewData["msgResult"];
+}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-lg-1"></div>
+        <div class="col-12 col-lg-10">
+
+            <!-- Alert Message -->
+            @Html.Raw(AlertMessage.GetMessage(msgResult))
+
+            <h3 class="text-center my-3">Perfil do Usuário</h3>
+
+            <form asp-action="SalvarPerfil" enctype="multipart/form-data" autocomplete="off" method="post">
+                @Html.HiddenFor(m => m.usuario.UsuarioId)
+
+
+                @*<h5 class="mt-5 mb-3">Dados de Acesso ao Painel</h5>
+                @if (Model.usuario.GetEmail != "site@site.com.br") {
+                <!-- E-mail -->
+                <div class="form-group">
+                @Html.LabelFor(m => m.usuario.EmailAlterar)
+                <input class="form-control" asp-for="usuario.EmailAlterar" value="@Model.usuario.Email" />
+                <span asp-validation-for="usuario.EmailAlterar" class="text-danger"></span>
+                </div>
+                }*@
+
+                @for (int g = 0; g < grupos.Count(); g++) {
+                    <h5 class="mt-5 mb-3">@grupos[g].Titulo</h5>
+
+                    for (int l = 0; l < grupos[g].Linhas.Count(); l++) {
+                        @Html.HiddenFor(m => m.grupos[g].Linhas[l].Linha_CadastroId)
+                        ;
+
+                        <div class="row">
+                            @for (int c = 0; c < grupos[g].Linhas[l].Campos.Count(); c++) {
+                                campo = grupos[g].Linhas[l].Campos[c];
+
+                                ViewData["grupos"] = grupos;
+                                ViewData["g"] = g;
+                                ViewData["l"] = l;
+                                ViewData["c"] = c;
+
+                                @* Define os formatos de Imagens *@
+                                if (campo.ModeloCampo == EModeloCampo.Imagem) {
+                                    campo.FormatosArquivo = string.Join(", ", campo.Dados[0].formatosImagemAceitos);
+                                }
+
+
+                                @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].Campo_CadastroId)
+                                ;
+                                @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].ModeloCampo)
+                                ;
+                                @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].CampoGenerico)
+                                ;
+                                @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Campo_CadastroId)
+                                ;
+                                @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Dado_CadastroId)
+                                ;
+
+                                switch (campo.ModeloCampo) {
+                                    case EModeloCampo.Texto_250:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Texto250.cshtml")
+                                        break;
+                                    case EModeloCampo.Texto_Longo:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_TextoLongo.cshtml")
+                                        break;
+                                    case EModeloCampo.Senha:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Senha.cshtml")
+                                        break;
+                                    case EModeloCampo.Confirmar_Senha:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_ConfirmarSenha.cshtml")
+                                        break;
+                                    case EModeloCampo.Email:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Email.cshtml")
+                                        break;
+                                    case EModeloCampo.Número:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Numero.cshtml")
+                                        break;
+                                    case EModeloCampo.Número_Monetário:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_NumeroMonetario.cshtml")
+                                        break;
+                                    case EModeloCampo.Select:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Select.cshtml")
+                                        break;
+                                    case EModeloCampo.MultiSelect:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_MultiSelect.cshtml")
+                                        break;
+                                    case EModeloCampo.CheckBox:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_CheckBox.cshtml")
+                                        break;
+                                    case EModeloCampo.RadioButton:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_RadioButton.cshtml")
+                                        break;
+                                    case EModeloCampo.Imagem:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Imagem.cshtml")
+                                        break;
+                                    case EModeloCampo.Documento:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Documento.cshtml")
+                                        break;
+                                    case EModeloCampo.Html:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Html.cshtml")
+                                        break;
+                                    case EModeloCampo.Vídeo_Youtube:
+                                        @await Html.PartialAsync("Perfil/ModelosCampos/_Texto_VideoYoutube.cshtml")
+                                        break;
+                                }
+
+                            }
+                        </div>
+                    }
+                }
+
+                <p class="mt-5 text-center text-md-left">
+                    <input type="submit" class="btn btn-success mb-3 mb-md-0" id="submit" value="Salvar Alterações">
+
+                    @if (acesso._permissao.VisualizarDadosUsuarios && !acesso.IsAdmin()) {
+                        <a class="btn btn-outline-primary" asp-action="DadosUsuario" asp-controller="Usuarios" asp-route-usuarioResult="@Model.usuario.UsuarioId">Dados Deste Usuário</a>
+                    }
+                    @if(acesso.UsuarioId == Model.usuario.UsuarioId && !acesso.IsAdmin()){
+                        <a class="btn btn-outline-primary" asp-action="AutenticarRemocao" asp-controller="Conta">Encerrar Conta</a>
+                    }
+
+                </p>
+            </form>
+
+        </div>
+        <div class="col-12 col-lg-1"></div>
+    </div>
+
+
+    <script>
+        //--------------------------------------------------------------------------------------------------------------------------------------------
+        $(function () {
+            $('.numero-monetario').maskMoney({ decimal: ',', thousands: '', precision: 2 });
+        })
+    </script>
+
+    <script>
+        var passFields = document.querySelectorAll('input[type="password"]');
+        if (passFields[0].value != "")
+            setTimeout(function () { passFields[0].value = ""; }, 1200);
+    </script>
+
+    <script src="~/js/Validations/ValidationCheckBox.js"></script>
+    <script src="~/js/Validations/ValidationFile.js"></script>
+</div>

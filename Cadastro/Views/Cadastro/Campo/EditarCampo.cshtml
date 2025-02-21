@@ -1,0 +1,507 @@
+﻿@model EditarCampoVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.Entities.DB.Account.Form.Seletores
+@using Cadastro.Models.ViewModel.Account.Cadastro.Campo
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts
+@using Cadastro;
+
+@{
+    ViewData["Title"] = "Editar Campo";
+    SelectList SLAutorizadoEditar = (SelectList)ViewData["SLAutorizadoEditar"];
+    SelectList SLStartCriacaoCampos = (SelectList)ViewData["SLStartCriacaoCampos"];
+    SelectList SLModelosCampos = (SelectList)ViewData["SLModelosCampos"];
+    SelectList SLDirecaoItens = (SelectList)ViewData["SLDirecaoItens"];
+    string msgResult = (string)ViewData["msgResult"];
+    EModeloCampo? modelo = (EModeloCampo?)ViewData["modelo"];
+    ViewData["ckeditor-simples"] = true;
+}
+
+@Html.Raw(AlertMessage.GetMessage(msgResult))
+
+<h4 class="text-center mt-3 mb-5">
+    @ViewData["Title"]<br />
+    <small>@Model.campo.ModeloCampo.ToString().Replace('_', ' ')</small>
+</h4>
+
+<form asp-action="EditarCampo" asp-controller="Cadastro" method="post">
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+
+            @Html.HiddenFor(m => m.campo.Linha_CadastroId)
+            @Html.HiddenFor(m => m.campo.Campo_CadastroId)
+            @Html.HiddenFor(m => m.campo.ModeloCampo)
+
+
+            <h4 class="mt-5">Modelo</h4>
+
+            @* Nome de Identificação *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.Nome)
+                @{
+                    if (Model.campo.Generico)
+                        @Html.TextBoxFor(m => m.campo.Nome, new { @class = "form-control", @disabled = "disabled" })
+                    else
+                        @Html.TextBoxFor(m => m.campo.Nome, new { @class = "form-control" })
+                }
+                @Html.ValidationMessageFor(m => m.campo.Nome, "", new { @class = "text-danger" })
+            </div>
+
+            @* Label *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.Label)
+                @Html.TextBoxFor(m => m.campo.Label, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.campo.Label, "", new { @class = "text-danger" })
+            </div>
+
+            @* Permissão de Edição (Quem poderá editar) *@
+            @if (modelo != EModeloCampo.Html && modelo != EModeloCampo.Vídeo_Youtube && Model.campo.CampoGenerico != ECampoGenerico.Senha && Model.campo.CampoGenerico != ECampoGenerico.ConfirmarSenha && Model.campo.CampoGenerico != ECampoGenerico.Email) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.AutorizadoEditar)
+                    @Html.DropDownListFor(m => m.campo.AutorizadoEditar, SLAutorizadoEditar, "Selecione uma Opção", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.AutorizadoEditar, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Local Start do Campo *@
+            @if (!Model.campo.Generico) {
+                <div class="form-group">
+                    <label>
+                        @switch (Model.campo.ModeloCampo) {
+                            case EModeloCampo.Html:
+                            case EModeloCampo.Vídeo_Youtube:
+                                @("Local que será Apresentado")
+                                break;
+                            default:
+                                @Html.DisplayNameFor(m => m.campo.StartCriacaoCampo)
+                                break;
+                        }
+                    </label>
+                    @Html.DropDownListFor(m => m.campo.StartCriacaoCampo, SLStartCriacaoCampos, "Selecione uma Opção", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.StartCriacaoCampo, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* #### Dados #### *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Html || Model.campo.ModeloCampo == EModeloCampo.Select || Model.campo.ModeloCampo == EModeloCampo.CheckBox || Model.campo.ModeloCampo == EModeloCampo.RadioButton) {
+                <h4 class="mt-5">Dados</h4>
+            }
+
+            @* Campo Html *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Html) {
+                <!-- Html -->
+                string ex = "Ex:\n<h3 class=\"text-center mb-3\">Título</h3>\n" +
+                "<p class=\"text-center text-primary\">Parágrafo</p>\n" +
+                "<img class=\"img-fluid\" src=\"https://domínio.com.br/imagem.jpg\">";
+
+                <div class="form-group mb-3">
+                    @Html.LabelFor(m => m.campo.Html)
+                    <textarea asp-for="campo.Html" class="form-control" rows="15" placeholder='@ex'></textarea>
+                    @Html.ValidationMessageFor(m => m.campo.Html, "", new { @class = "text-danger" })
+                </div>
+
+                <script type="text/javascript">
+                    window.onload = function () {
+                        CKEDITOR.replace('@Html.IdFor(m => m.campo.Html)');
+                    };
+                </script>
+            }
+
+            @* Itens *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Select || Model.campo.ModeloCampo == EModeloCampo.CheckBox || Model.campo.ModeloCampo == EModeloCampo.RadioButton) {
+                <label>Itens</label>
+                <div style="overflow-x: auto;">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center align-middle">Ordem</th>
+                                <th class="text-center align-middle">Nome</th>
+                                <th class="text-center align-middle">Pré-Selecionado</th>
+                                <th class="text-center align-middle">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @switch (Model.campo.ModeloCampo) {
+                                case EModeloCampo.Select:
+                                    foreach (Select_Item sel in Model.campo.Selects.OrderBy(s => s.Ordem)) {
+                                        <tr>
+                                            <td class="text-center align-middle">@sel.Ordem</td>
+                                            <td class="text-center align-middle">@sel.Nome</td>
+                                            <td class="text-center align-middle">@(sel.PreSelecionado ? "Sim" : "Não")</td>
+                                            <td class="text-center align-middle container-btn-icon">
+                                                @if (sel.PreSelecionado) {
+                                                    <a title="Desmarcar" asp-action="PreSelecionar_Select" asp-controller="SeletoresCadastro" asp-route-id="@sel.Select_ItemId" class="icon-caneta">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="text-success"><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm0 400H48V80h352v352zm-35.864-241.724L191.547 361.48c-4.705 4.667-12.303 4.637-16.97-.068l-90.781-91.516c-4.667-4.705-4.637-12.303.069-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l59.792 60.277 141.352-140.216c4.705-4.667 12.303-4.637 16.97.068l22.536 22.718c4.667 4.706 4.637 12.304-.068 16.971z" /></svg>
+                                                    </a>
+                                                } else {
+                                                    <a title="Definir Selecionado" asp-action="PreSelecionar_Select" asp-controller="SeletoresCadastro" asp-route-id="@sel.Select_ItemId" class="icon-caneta">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="text-secondary"><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z" /></svg>
+                                                    </a>
+                                                }
+
+                                                @if (!Model.campo.Generico) {
+                                                    <a title="Editar Opção" asp-action="Editar_Select" asp-controller="SeletoresCadastro" asp-route-id="@sel.Select_ItemId" class="icon-caneta">
+                                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil-alt" class="svg-inline--fa fa-pencil-alt fa-w-16 text-success" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                                    </a>
+                                                    <a title="Remover Opção" asp-action="Remover_Select" asp-controller="SeletoresCadastro" asp-route-id="@sel.Select_ItemId" class="icon-caneta">
+                                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-alt" class="svg-inline--fa fa-trash-alt fa-w-14 text-danger" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path></svg>
+                                                    </a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                    break;
+                                case EModeloCampo.CheckBox:
+                                    foreach (CheckBox_Item sel in Model.campo.CheckBoxes.OrderBy(c => c.Ordem)) {
+                                        <tr>
+                                            <td class="text-center align-middle">@sel.Ordem</td>
+                                            <td class="text-center align-middle">@Html.Raw(sel.Nome)</td>
+                                            <td class="text-center align-middle">@(sel.PreChecked ? "Sim" : "Não")</td>
+                                            <td class="text-center align-middle container-btn-icon">
+                                                @if (sel.PreChecked) {
+                                                    <a title="Deselecionar" asp-action="PreSelecionar_CheckBox" asp-controller="SeletoresCadastro" asp-route-id="@sel.CheckBox_ItemId" class="icon-caneta">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="text-success"><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm0 400H48V80h352v352zm-35.864-241.724L191.547 361.48c-4.705 4.667-12.303 4.637-16.97-.068l-90.781-91.516c-4.667-4.705-4.637-12.303.069-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l59.792 60.277 141.352-140.216c4.705-4.667 12.303-4.637 16.97.068l22.536 22.718c4.667 4.706 4.637 12.304-.068 16.971z" /></svg>
+                                                    </a>
+                                                } else {
+                                                    <a title="Definir Selecionado" asp-action="PreSelecionar_CheckBox" asp-controller="SeletoresCadastro" asp-route-id="@sel.CheckBox_ItemId" class="icon-caneta">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="text-secondary"><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z" /></svg>
+                                                    </a>
+                                                }
+                                                @if (!Model.campo.Generico) {
+                                                    <a title="Editar Linha" asp-action="Editar_Checkbox" asp-controller="SeletoresCadastro" asp-route-id="@sel.CheckBox_ItemId" class="icon-caneta">
+                                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil-alt" class="svg-inline--fa fa-pencil-alt fa-w-16 text-success" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                                    </a>
+                                                    <a title="Remover Linha" asp-action="Remover_CheckBox" asp-controller="SeletoresCadastro" asp-route-id="@sel.CheckBox_ItemId" class="icon-caneta">
+                                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-alt" class="svg-inline--fa fa-trash-alt fa-w-14 text-danger" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path></svg>
+                                                    </a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                    break;
+                                case EModeloCampo.RadioButton:
+                                    foreach (RadioButton_Item sel in Model.campo.RadioButtons.OrderBy(r => r.Ordem)) {
+                                        <tr>
+                                            <td class="text-center align-middle">@sel.Ordem</td>
+                                            <td class="text-center align-middle">@sel.Nome</td>
+                                            <td class="text-center align-middle">@(sel.PreChecked ? "Sim" : "Não")</td>
+                                            <td class="text-center align-middle container-btn-icon">
+                                                @if (sel.PreChecked) {
+                                                    <a title="Desmarcar" asp-action="PreSelecionar_RadioButton" asp-controller="SeletoresCadastro" asp-route-id="@sel.RadioButton_ItemId" class="icon-caneta">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="text-success"><path fill="currentColor" d="M400 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V80c0-26.51-21.49-48-48-48zm0 400H48V80h352v352zm-35.864-241.724L191.547 361.48c-4.705 4.667-12.303 4.637-16.97-.068l-90.781-91.516c-4.667-4.705-4.637-12.303.069-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l59.792 60.277 141.352-140.216c4.705-4.667 12.303-4.637 16.97.068l22.536 22.718c4.667 4.706 4.637 12.304-.068 16.971z" /></svg>
+                                                    </a>
+                                                } else {
+                                                    <a title="Definir Selecionado" asp-action="PreSelecionar_RadioButton" asp-controller="SeletoresCadastro" asp-route-id="@sel.RadioButton_ItemId" class="icon-caneta">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="text-secondary"><path fill="currentColor" d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V86c0-3.3 2.7-6 6-6h340c3.3 0 6 2.7 6 6v340c0 3.3-2.7 6-6 6z" /></svg>
+                                                    </a>
+                                                }
+                                                @if (!Model.campo.Generico) {
+                                                    <a title="Editar Linha" asp-action="Editar_RadioButton" asp-controller="SeletoresCadastro" asp-route-id="@sel.RadioButton_ItemId" class="icon-caneta">
+                                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil-alt" class="svg-inline--fa fa-pencil-alt fa-w-16 text-success" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>
+                                                    </a>
+                                                    <a title="Remover Linha" asp-action="Remover_RadioButton" asp-controller="SeletoresCadastro" asp-route-id="@sel.RadioButton_ItemId" class="icon-caneta">
+                                                        <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="trash-alt" class="svg-inline--fa fa-trash-alt fa-w-14 text-danger" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path></svg>
+                                                    </a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                    break;
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+                @* Novos Itens *@
+                if (!Model.campo.Generico) {
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.campo.ItensSeletores_Novos)
+                        @Html.TextAreaFor(m => m.campo.ItensSeletores_Novos, new { @class = "form-control", @placeholder = "Informe um item por linha.\nUse a tag #p# para especificar o(s) item(ns) selecionado(s).\nMáximo 300 caracteres por linha.", @rows = "7" })
+                        @Html.ValidationMessageFor(m => m.campo.ItensSeletores_Novos)
+                    </div>
+                }
+
+            }
+
+
+
+            @if (Model.campo.CampoGenerico != ECampoGenerico.Campo_Personalizado && Model.campo.ModeloCampo != EModeloCampo.Html && Model.campo.ModeloCampo != EModeloCampo.Vídeo_Youtube && !Model.campo.Generico) {
+                <h4 class="mt-5">Características</h4>
+            }
+
+            @* Ativo *@
+            @if (!Model.campo.Generico) {
+                <label class="mb-0 pb-0">@Html.DisplayNameFor(m => m.campo.Ativo)</label>
+                <div class="form-group">
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Ativo, true, new { @class = "form-check-input", @id = "iAtivoSim" })
+                        @Html.LabelFor(m => m.campo.Ativo, "Sim", new { @class = "form-check-label", @for = "iAtivoSim" })
+                    </div>
+
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Ativo, false, new { @class = "form-check-input", @id = "iAtivoNao" })
+                        @Html.LabelFor(m => m.campo.Ativo, "Não", new { @class = "form-check-label", @for = "iAtivoNao" })
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.campo.Ativo, "", new { @class = "text-danger" })
+            }
+
+            @* Obrigatório *@
+            @if (Model.campo.ModeloCampo != EModeloCampo.Html && Model.campo.ModeloCampo != EModeloCampo.Vídeo_Youtube && !Model.campo.Generico) {
+                <label class="mb-0 pb-0">@Html.DisplayNameFor(m => m.campo.Required)</label>
+                <div class="form-group">
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Required, true, new { @class = "form-check-input", @id = "iObrigatorioSim" })
+                        @Html.LabelFor(m => m.campo.Required, "Sim", new { @class = "form-check-label", @for = "iObrigatorioSim" })
+                    </div>
+
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Required, false, new { @class = "form-check-input", @id = "iObrigatorioNao" })
+                        @Html.LabelFor(m => m.campo.Required, "Não", new { @class = "form-check-label", @for = "iObrigatorioNao" })
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.campo.Required, "", new { @class = "text-danger" })
+            }
+
+            @* Único *@
+            @if ((Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Texto_Longo || Model.campo.ModeloCampo == EModeloCampo.Email || Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) && !Model.campo.Generico) {
+                <label class="mb-0 pb-0">@Html.DisplayNameFor(m => m.campo.Unico)</label>
+                <div class="form-group">
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Unico, true, new { @class = "form-check-input", @id = "iUnicoSim" })
+                        @Html.LabelFor(m => m.campo.Unico, "Sim", new { @class = "form-check-label", @for = "iUnicoSim" })
+                    </div>
+
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Unico, false, new { @class = "form-check-input", @id = "iUnicoNao" })
+                        @Html.LabelFor(m => m.campo.Unico, "Não", new { @class = "form-check-label", @for = "iUnicoNao" })
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.campo.Unico, "", new { @class = "text-danger" })
+            }
+
+            @* Criptografia *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Texto_Longo) {
+                <label class="mb-0 pb-0">@Html.DisplayNameFor(m => m.campo.Criptografar)</label>
+                <div class="form-group">
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Criptografar, true, new { @class = "form-check-input", @id = "iCriptografiaSim", @disabled = "disabled" })
+                        @Html.LabelFor(m => m.campo.Criptografar, "Sim", new { @class = "form-check-label", @for = "iCriptografiaSim" })
+                    </div>
+
+                    <div class="form-check-inline">
+                        @Html.RadioButtonFor(m => m.campo.Criptografar, false, new { @class = "form-check-input", @id = "iCriptografiaNao", @disabled = "disabled" })
+                        @Html.LabelFor(m => m.campo.Criptografar, "Não", new { @class = "form-check-label", @for = "iCriptografiaNao" })
+                    </div>
+                </div>
+                @Html.ValidationMessageFor(m => m.campo.Unico, "", new { @class = "text-danger" })
+            }
+
+            @* Formatos Aceitos *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Documento) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.FormatosArquivo_Required)
+                    @Html.TextBoxFor(m => m.campo.FormatosArquivo_Required, new { @class = "form-control", @placeholder = "Ex: .pdf, .doc, .xml..." })
+                    @Html.ValidationMessageFor(m => m.campo.FormatosArquivo_Required, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Comprimento do texto - 250 *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.GetSetComprimentoTextoMax250)
+                    @Html.TextBoxFor(m => m.campo.GetSetComprimentoTextoMax250, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.GetSetComprimentoTextoMax250, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_Longo) {
+                @* Comprimento do texto - 3000 *@
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.GetSetComprimentoTextoMax3000)
+                    @Html.TextBoxFor(m => m.campo.GetSetComprimentoTextoMax3000, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.GetSetComprimentoTextoMax3000, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* PlaceHolder *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Texto_Longo || Model.campo.ModeloCampo == EModeloCampo.Email || Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.PlaceHolder)
+                    @Html.TextBoxFor(m => m.campo.PlaceHolder, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.PlaceHolder, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Conteúdo Preenchido *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Texto_Longo) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.TextoPreenchido)
+                    @Html.TextBoxFor(m => m.campo.TextoPreenchido, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.TextoPreenchido, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Número Preenchido *@
+            @{
+                bool numMon = (Model.campo.ModeloCampo == EModeloCampo.Número_Monetário);/*É número monetário?*/
+            }
+            @if (Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.NumeroPreenchido)
+                    @Html.TextBoxFor(m => m.campo.NumeroPreenchido, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.NumeroPreenchido, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Mínimo (Número) *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.Min)
+                    @Html.TextBoxFor(m => m.campo.Min, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.Min, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Máximo (Número) *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.Número || Model.campo.ModeloCampo == EModeloCampo.Número_Monetário) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.Max)
+                    @Html.TextBoxFor(m => m.campo.Max, "", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.Max, "", new { @class = "text-danger" })
+                </div>
+            }
+
+            @* Direção Itens (Horizontal/Vertical) *@
+            @if (Model.campo.ModeloCampo == EModeloCampo.CheckBox || Model.campo.ModeloCampo == EModeloCampo.RadioButton || Model.campo.ModeloCampo == EModeloCampo.MultiSelect) {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.campo.DirecaoEixo)
+                    @Html.DropDownListFor(m => m.campo.DirecaoEixo, SLDirecaoItens, "Selecione uma Opção", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.campo.DirecaoEixo, "", new { @class = "text-danger" })
+                </div>
+            }
+
+
+            @* Colunas *@
+            <h4 class="mt-5">Colunas no Cadastro</h4>
+
+            @* Ordem - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.Ordem_Cadastro)
+                @Html.TextBoxFor(m => m.campo.Ordem_Cadastro, "", new { @class = "form-control", @placeholder = "Informe a ordem do Campo" })
+                @Html.ValidationMessageFor(m => m.campo.Ordem_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas XS - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasXS_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasXS_Cadastro, new { @class = "form-control", @placeholder = "Entre 1 e 12" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasXS_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas SM - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasSM_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasSM_Cadastro, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasSM_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas MD - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasMD_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasMD_Cadastro, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasMD_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas LG - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasLG_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasLG_Cadastro, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasLG_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas XL - Cadastro *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasXL_Cadastro)
+                @Html.TextBoxFor(m => m.campo.ColunasXL_Cadastro, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasXL_Cadastro, "", new { @class = "text-danger" })
+            </div>
+
+            <h4 class="mt-5">Colunas no Perfil</h4>
+
+            @* Ordem - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.Ordem_Perfil)
+                @Html.TextBoxFor(m => m.campo.Ordem_Perfil, "", new { @class = "form-control", @placeholder = "Informe a ordem do Campo" })
+                @Html.ValidationMessageFor(m => m.campo.Ordem_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas XS - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasXS_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasXS_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasXS_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas SM - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasSM_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasSM_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasSM_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas MD - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasMD_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasMD_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasMD_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas LG - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasLG_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasLG_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasLG_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+            @* Colunas XL - Perfil *@
+            <div class="form-group">
+                @Html.LabelFor(m => m.campo.ColunasXL_Perfil)
+                @Html.TextBoxFor(m => m.campo.ColunasXL_Perfil, "", new { @class = "form-control", @placeholder = "Entre 0 e 12. 0 = indefinido" })
+                @Html.ValidationMessageFor(m => m.campo.ColunasXL_Perfil, "", new { @class = "text-danger" })
+            </div>
+
+
+            @* Permitir ser Pesquisado *@
+            @if ((Model.campo.ModeloCampo == EModeloCampo.Texto_250 || Model.campo.ModeloCampo == EModeloCampo.Email) && !Model.campo.Criptografar) {
+                <div class="form-group">
+                    <div class="form-check">
+                        @Html.CheckBoxFor(m => m.campo.PermitirPesquisa, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.campo.PermitirPesquisa, new { @class = "text-info form-check-label" })
+                        @Html.ValidationMessageFor(m => m.campo.PermitirPesquisa)
+                    </div>
+                </div>
+            }
+
+            <!-- Deportar Campo -->
+            @if (Model.campo.Generico) {
+                <div class="form-group">
+                    <div class="form-check">
+                        @Html.CheckBoxFor(m => m.DeportarCampo, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.DeportarCampo, new { @class = "text-info form-check-label" })
+                        @Html.ValidationMessageFor(m => m.DeportarCampo)
+                    </div>
+                </div>
+            }
+
+            <p class="mt-5">
+                <input class="btn btn-success" type="submit" value="Salvar Alterações" />
+                <a asp-action="Index" asp-controller="Configuracao" class="btn btn-outline-secondary">Voltar</a>
+            </p>
+
+        </div>
+        <div class="col-2"></div>
+    </div>
+</form>

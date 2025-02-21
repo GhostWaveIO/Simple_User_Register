@@ -1,0 +1,258 @@
+﻿@model UsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Account;
+@using Cadastro.Models.ViewModel.Application.AccessContext
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts
+@using Cadastro;
+@using Cadastro.Models.Services.Application.Security.Autorizacao;
+
+@{
+    ViewData["Title"] = "Dados do Usuário";
+    AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+    Usuario usuario = (Usuario)ViewData["usuario"];
+    List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+    Campo_Cadastro campo = null;
+    List<Usuario> listaIndicacoes = (List<Usuario>)ViewData["listaIndicacoes"];
+}
+
+
+<div class="container">
+    <!-- Alert Message -->
+    @Html.Raw(AlertMessage.GetMessage(Model.msgResult))
+
+    <h3 class="text-center mt-3 mb-5">Dados do @Program.Config.nomeUserSingular</h3>
+      
+    @for (int g = 0; g < grupos.Count(); g++) {
+        <h4 class="mt-4 mb-1">@grupos[g].Titulo</h4>
+        <table class="table table-sm table-bordered">
+
+            @for (int l = 0; l < grupos[g].Linhas.Count(); l++) {
+
+                for (int c = 0; c < grupos[g].Linhas[l].Campos.Count(); c++) {
+                    campo = grupos[g].Linhas[l].Campos[c];
+                    if (campo.ModeloCampo == EModeloCampo.Select && !campo.Selects.Any()) continue;
+                    if (campo.ModeloCampo == EModeloCampo.CheckBox && !campo.CheckBoxes.Any()) continue;
+                    if (campo.ModeloCampo == EModeloCampo.RadioButton && !campo.RadioButtons.Any()) continue;
+                    if (!campo.Ativo) continue;
+                    if (campo.ModeloCampo == EModeloCampo.Senha || campo.ModeloCampo == EModeloCampo.Confirmar_Senha || campo.ModeloCampo == EModeloCampo.Html || campo.ModeloCampo == EModeloCampo.Vídeo_Youtube) continue;
+                    @Html.Raw($"<tr>" +
+        $"<th class=\"text-center align-middle\">{campo.Nome}</th>")
+
+
+                    campo.Dado_ThisSession = usuario.Dados.FirstOrDefault(d => d.Campo_CadastroId == campo.Campo_CadastroId);
+                    if (campo.Dado_ThisSession == null) {
+                        @Html.Raw($"<td class=\"text-center align-middle\">[Não Informado]</td></tr>")
+                        continue;
+                    }
+
+                    ViewData["g"] = g;
+                    ViewData["l"] = l;
+                    ViewData["c"] = c;
+
+
+                    switch (campo.Dado_ThisSession.GetModeloCampo) {
+                        case EModeloCampo.Texto_250:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_Texto250.cshtml")
+                            break;
+                        case EModeloCampo.Texto_Longo:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_TextoLongo.cshtml")
+                            break;
+                        case EModeloCampo.Email:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_Email.cshtml")
+                            break;
+                        case EModeloCampo.Número:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_Numero.cshtml")
+                            break;
+                        case EModeloCampo.Número_Monetário:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_NumeroMonetario.cshtml")
+                            break;
+                        case EModeloCampo.Select:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_Select.cshtml")
+                            break;
+                        case EModeloCampo.MultiSelect:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_MultiSelect.cshtml")
+                            break;
+                        case EModeloCampo.CheckBox:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_CheckBox.cshtml")
+                            break;
+                        case EModeloCampo.RadioButton:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_RadioButton.cshtml")
+                            break;
+                        case EModeloCampo.Imagem:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_Imagem.cshtml")
+                            break;
+                        case EModeloCampo.Documento:
+                            @await Html.PartialAsync("DadosUsuario/ModelosCampos/_Documento.cshtml")
+                            break;
+                    }
+                    @Html.Raw("</tr>")
+                }
+            }
+        </table>
+    }
+
+
+
+    <!-- Outros -->
+    <h4 class="mt-4 mb-1">Outros</h4>
+    <table class="table table-sm table-bordered">
+        <!-- Email Confirmado -->
+        <tr>
+            <th class="align-middle">Confirmação de Email</th>
+            <td class="@(usuario.EmailsValidados.Any(ev => ev.Confirmado)?"text-success":"text-danger font-weight-bolder")">@(usuario.EmailsValidados.Any(ev => ev.Confirmado) ? "Confirmado" : "Não Confirmado")</td>
+        </tr>
+        <!-- Email Confirmado -->
+        <tr>
+            <th class="align-middle">Código de Usuário</th>
+            <td class="">@usuario.CodigoUsuario</td>
+        </tr>
+        <!-- Status -->
+        <tr>
+            <th class="align-middle">Status</th>
+            @{
+                Dictionary<string, string> listaStatus = new Dictionary<string, string>() {
+            { ((int)EStatus.Apto).ToString(), EStatus.Apto.ToString() },
+            { ((int)EStatus.Suspenso).ToString(), EStatus.Suspenso.ToString() },
+            { ((int)EStatus.Inválido).ToString(), EStatus.Inválido.ToString() },
+            { ((int)EStatus.Vencido).ToString(), EStatus.Vencido.ToString() }
+            };
+                SelectList SLStatus = new SelectList(listaStatus, "Key", "Value");
+                foreach (SelectListItem i in SLStatus) {
+                    if (((int)usuario.Status).ToString() == i.Value) {
+                        i.Selected = true;
+                    }
+                }
+            }
+            <td>
+                <form asp-action="DefinirStatus" method="post">
+                    <input hidden="hidden" type="number" name="uRes" value="@usuario.UsuarioId" />
+                    <div class="row">
+                        <div class="col-6">
+                            <select class="form-control form-control-sm" name="status" asp-items="SLStatus">
+                            </select>
+                        </div>
+
+                        <div class="col-6 text-sm-right">
+                            <button class="btn btn-sm btn-secondary">Alterar</button>
+                        </div>
+                    </div>
+                </form>
+            </td>
+        </tr>
+
+        <!-- Último Ip Acessado -->
+        <tr class="align-middle" hidden="hidden">
+            <th>Ip de Último Acesso</th>
+            <td>@usuario.IpUltimoAcesso</td>
+        </tr>
+        <!-- Data de Cadastro -->
+        <tr class="align-middle">
+            <th>Data de Cadastro</th>
+            <td>@usuario.DataCadastro.ToString("dd/MM/yyyy HH:mm")</td>
+        </tr>
+    </table>
+
+
+
+    @if (acesso._permissao.EditarHierarquiaUsuario) {
+        <hr />
+        <!-- Hierarquia do Usuário -->
+        <h4 class="mt-4 mb-1">Permissão</h4>
+        <div class="container">
+
+            <div class="row">
+                <div class="col-12 col-md-3"></div>
+                <div class="col-12 col-md-6">
+                    <div class="p-3">
+
+
+                        <form asp-action="AlterarHierarquia" method="post">
+
+                            <input hidden="hidden" type="number" asp-for="pesquisa" value="@ViewBag.Pesquisa" />
+                            <input hidden="hidden" type="number" asp-for="pagPesquisa" value="@ViewBag.Pagina" />
+                            <input hidden="hidden" type="number" asp-for="usuario.UsuarioId" value="@usuario.UsuarioId" />
+
+                            @{
+                                SelectList sListaHierarquias = new SelectList(Model.listaHierarquias ?? new List<Hierarquia>(), "HierarquiaId", "Titulo");
+                            }
+                            <div calss="form-group">
+                                <label asp-for="hierarquia.HierarquiaId">Adicionar Permissão</label>
+                                <select class="form-control" asp-for="hierarquia.HierarquiaId" asp-items="@(sListaHierarquias)">
+                                </select>
+                            </div>
+                            @if ((Model.listaHierarquias ?? new List<Hierarquia>()).Count() > 0) {
+                                <p class="mt-3"><button type="submit" class="btn btn-success">Adicionar Permissão</button></p>
+                            }
+
+                        </form>
+                        <hr />
+
+                        <h6 class="text-center mb-3">Permissões do @Program.Config.nomeUserSingular</h6>
+                        <p class="text-center">
+                            @{
+                                HierarquiaUsuario NivelVendedorUsuario = null;
+                            }
+                            @foreach (HierarquiaUsuario h in (List<HierarquiaUsuario>)ViewData["NiveisDoUsuario"]) {
+                                <span class="bg-info text-white pl-3 pr-2 py-2">
+                                    @h.Hierarquia.Titulo &nbsp;<a class="badge badge-white badge-dark mb-5" asp-action="RemoverNivelHierarquia" asp-route-usuarioResult="@usuario.UsuarioId" asp-route-huId="@h.Hierarquia.HierarquiasUsuario.FirstOrDefault(hu => hu.UsuarioId == usuario.UsuarioId).HierarquiaUsuarioId">X</a>
+                                </span>
+
+                                @Html.Raw("&nbsp; &nbsp;")
+                            }
+
+                            @if (((List<HierarquiaUsuario>)ViewData["NiveisDoUsuario"]).Count() == 0) {
+                            <p class="text-info">Este @Program.Config.nomeUserSingular não está em nenhuma Permissão.</p>
+                            }
+
+
+                        <!-- Nível Horizontal -->
+                        @if (NivelVendedorUsuario != null && false) {
+                        <hr />
+                        <h6 class="text-center mb-3">Permissão @NivelVendedorUsuario.Hierarquia.Titulo</h6>
+                        <p class="text-center">
+                            <a class="btn @(NivelVendedorUsuario.NivelHorizontal == ENivelH.Iniciante?"btn-primary":"btn-secondary")" asp-action="AlterarNivelHorizontal" asp-route-NH="0" asp-route-NV="@NivelVendedorUsuario.Hierarquia.HierarquiaId" asp-route-HU="@NivelVendedorUsuario.HierarquiaUsuarioId" asp-route-uR="@usuario.UsuarioId">@ENivelHPopular.Prata</a>
+                            <a class="btn @(NivelVendedorUsuario.NivelHorizontal == ENivelH.Intermediário?"btn-primary":"btn-secondary")" asp-action="AlterarNivelHorizontal" asp-route-NH="1" asp-route-NV="@NivelVendedorUsuario.Hierarquia.HierarquiaId" asp-route-HU="@NivelVendedorUsuario.HierarquiaUsuarioId" asp-route-uR="@usuario.UsuarioId">@ENivelHPopular.Ouro</a>
+                            <a class="btn @(NivelVendedorUsuario.NivelHorizontal == ENivelH.Avançado?"btn-primary":"btn-secondary")" asp-action="AlterarNivelHorizontal" asp-route-NH="2" asp-route-NV="@NivelVendedorUsuario.Hierarquia.HierarquiaId" asp-route-HU="@NivelVendedorUsuario.HierarquiaUsuarioId" asp-route-uR="@usuario.UsuarioId">@ENivelHPopular.Diamante</a>
+                        </p>
+                            @if (NivelVendedorUsuario.NivelHorizontal == null) {
+                            <span class="text-danger">Defina uma Permissão</span>
+                            }
+
+                        }
+
+                    </div>
+
+                </div>
+                <div class="col-12 col-md-3"></div>
+            </div>
+
+        </div>
+    }
+    <hr />
+
+
+    <p class="mt-5">
+        @if (acesso._permissao.EditarDadosUsuarios) {
+            <a class="btn btn-primary" asp-action="Perfil" asp-controller="Usuarios" asp-route-usuarioResult="@usuario.UsuarioId">Editar Perfil</a>
+        }
+        @if (acesso._usuario.IsAdmin()) {
+            @Html.Raw("&nbsp;")
+
+            <a class="btn btn-outline-danger" href="#" onclick="removerUsuario()">Remover Usuário</a>
+        }
+    </p>
+
+    @if (acesso._permissao.ApagarUsuario) {
+        <script>
+            function removerUsuario() {
+                var confirmacao = confirm("Tem certeza que deseja remover este usuário do sistema?");
+                if (confirmacao) {
+                    location.assign("@Url.Action("RemoverUsuario", "Conta", new{ id = usuario.UsuarioId})");
+                }
+            }
+        </script>
+    }
+
+</div>

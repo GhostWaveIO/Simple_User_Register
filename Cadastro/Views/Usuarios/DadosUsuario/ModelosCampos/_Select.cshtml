@@ -1,0 +1,38 @@
+﻿@model UsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form.Seletores
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Account
+@using Cadastro.Models.ViewModel.Application.AccessContext
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+  List<Select_Item> listaOptions = grupos[g].Linhas[l].Campos[c].Selects?.OrderBy(s => s.Ordem).ToList();
+  string selected = listaOptions.FirstOrDefault(l => l.PreSelecionado)?.Select_ItemId.ToString();
+  grupos[g].Linhas[l].Campos[c].Dados[0].Selected.Select_ItemId_Required = listaOptions.FirstOrDefault(l => l.PreSelecionado)?.Select_ItemId??0;
+
+  SelectList SLOptions = new SelectList(listaOptions, "Select_ItemId", "Nome", selected);
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+
+  string strItem = campo.Dado_ThisSession.Selected?.Select_Item?.Nome?? "[Não Definido]";
+}
+
+
+<td class="text-center align-middle">
+
+  @strItem
+
+</td>

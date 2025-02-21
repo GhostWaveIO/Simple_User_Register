@@ -1,0 +1,6 @@
+﻿<!-- Rodapé -->
+<footer>
+  @{
+    @Html.Raw(Program.Config.txtFooter.Replace("#nome-sistema", Program.Config.nomeSistema).Replace("#url-site", Program.Config.urlSite).Replace("#url-sistema", Url.ActionLink("", "")));
+  }
+</footer>

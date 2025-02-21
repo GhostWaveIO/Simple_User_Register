@@ -1,0 +1,267 @@
+﻿@*using Cadastro.Models.Services.Application.Security.Autorizacao*@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - @Program.Config.nomeSistema</title>
+  <meta name="author" content="SCSA">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="~/Imagens/icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="~/Imagens/icon180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="~/Imagens/icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="~/Imagens/icon.png">
+  <link rel="manifest" href="~/webmanifest.json">
+  <link rel="mask-icon" href="~/Imagens/icon.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src="~/lib/jquery/dist/jquery-3.6.0.min.js"></script>
+  <script src="~/lib/jquery-validation/1.19.3/jquery.validate.js"></script>
+  <script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
+  <script src="~/lib/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
+  <script src="~/lib/jquery-maskmoney/jquery.maskMoney.min.js"></script>
+
+  <script>
+    //Reconhecer vírgula na validação da valores monetários
+    $.validator.methods.range = function (value, element, param) {
+      var globalizedValue = value.replace(".", "");
+      globalizedValue = globalizedValue.replace(",", ".");
+      return this.optional(element) ||
+        (globalizedValue >= param[0] &&
+          globalizedValue <= param[1]);
+    };
+
+    $.validator.methods.number = function (value, element) {
+      return this.optional(element) ||
+        /^-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[\.,]\d+)?$/
+          .test(value);
+    };
+  </script>
+
+  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+  <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+  <link rel="stylesheet" href="~/css/site.css" />
+  <style>
+    /* Cabeçalho */
+    #cabMain img {
+      height: 50px;
+    }
+
+    /* Campo Conf */
+    .nav-link svg {
+      position: relative;
+      height: 20px;
+      display: inline-block;
+      margin: 0;
+      color: @Program.Config.corMenu["icone"];
+      transition: .2s;
+      cursor: pointer;
+    }
+
+    .nav-link svg:hover {
+      color: @Program.Config.corMenu["iconeHover"];
+    }
+
+    .nav-link svg.ativo {
+      color: @Program.Config.corMenu["iconeAtivo"];
+    }
+
+    /* Botão Caneta */
+    a.icon-caneta {
+      color: rgba(0,0,0,0);
+    }
+    .icon-caneta svg {
+      position: relative;
+      height: 16px;
+      display: inline-block;
+      margin: 0;
+      color: #FFAA00;
+      transition: .2s;
+      cursor: pointer;
+    }
+
+    .icon-caneta svg:hover {
+      color: #3366ff;
+    }
+
+    .icon-caneta svg.ativo {
+      color: #3366ff;
+    }
+
+    /* Menu */
+    .bg-mainMenu {
+      background-color: @Program.Config.corMenu["bg"];
+    }
+
+    .bg-mainMenu .navbar-brand {
+      color: @Program.Config.corMenu["title"];
+    }
+
+    .bg-mainMenu .navbar-brand:hover {
+      color: @Program.Config.corMenu["titleHover"];
+    }
+
+    .bg-mainMenu .navbar-toggler {
+      border: 2px solid @Program.Config.corMenu["iconeDropMenu"];
+    }
+
+    .bg-mainMenu .navbar-toggler-icon {
+      color: @Program.Config.corMenu["iconeDropMenuBorda"];
+    }
+
+    .bg-mainMenu .navbar-collapse .nav-link {
+      color: @Program.Config.corMenu["item"];
+    }
+
+    .bg-mainMenu .navbar-collapse .nav-link:hover {
+      color: @Program.Config.corMenu["itemHover"];
+    }
+
+      .bg-mainMenu .navbar-collapse .badge {
+        background-color: @Program.Config.corMenu["badge"]
+;
+        color: @Program.Config.corMenu["badgeNumero"];
+      }
+  </style>
+
+
+  <link rel="stylesheet" href="~/css/Autorizacao/hierarquia/permissao.css" type="text/css" />
+  <link rel="stylesheet" href="~/css/NoMenu/footer.css" type="text/css" />
+  <style>
+  /*Rodapé*/
+
+    footer {
+      background: @Program.Config.corRodape["bg"];
+      width: 100%;
+      box-sizing: border-box;
+      position: relative;
+      padding: 0;
+    }
+
+    footer #footer1 {
+      background: @Program.Config.corRodape["bg"];
+      width: 100%;
+      box-sizing: border-box;
+      color: @Program.Config.corRodape["texto"];
+      font-size: 11pt;
+    }
+
+    footer #footer2 {
+      background: #ffaa00;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 11pt;
+      font-weight: bold;
+    }
+  </style>
+
+  <!-- DropDown do Menu -->
+  <style>
+    .navbar .dropdown-toggle, .navbar .dropdown-menu a {
+      cursor: pointer;
+    }
+
+    .navbar .dropdown-item.active, .navbar .dropdown-item:active {
+      color: inherit;
+      text-decoration: none;
+      background-color: inherit;
+    }
+
+    .navbar .dropdown-item:focus, .navbar .dropdown-item:hover {
+      color: #16181b;
+      text-decoration: none;
+      background-color: #f8f9fa;
+    }
+
+    @@media (min-width: 767px) {
+      .navbar .dropdown-toggle:not(.nav-link)::after {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: .5em;
+        vertical-align: 0;
+        border-bottom: .3em solid transparent;
+        border-top: .3em solid transparent;
+        border-left: .3em solid;
+      }
+    }
+  </style>
+
+  @if ((bool?)ViewData["ckeditor-simples"] != null) {
+    <script type="text/javascript" src="~/lib/ckeditor-simples/ckeditor.js"></script>
+  }
+
+  <!-- select 2 -->
+  <link href="~/lib/form/select2/css/select2.css" rel="stylesheet" />
+  <script src="/lib/form/select2/js/select2.min.js"></script>
+
+  @*<style>*@
+  @Html.Raw(ViewData["css"])
+  @*</style>*@
+
+  <link rel="stylesheet" href="~/css/Painel/Home/Home.css" />
+
+
+</head>
+<body>
+  @await Html.PartialAsync("_AlertaAceitarConvite")
+
+    <!-- Cabeçalho -->
+    @await Html.PartialAsync("_CabecalhoPainel")
+
+      <div>
+        <main role="main" class="pb-3">
+          @RenderBody()
+        </main>
+      </div>
+
+      <div class="text-center mt-5 mb-3 pt-2 border-top">
+        <a target="_self" asp-action="Index" asp-controller="Home">Início</a>
+        @if (!String.IsNullOrEmpty(Program.Config.urlSite)) {
+          @Html.Raw(" &nbsp;| &nbsp;")<a target="_blank" href="@Program.Config.urlSite">Visitar Site</a>
+        }
+        @Html.Raw(" &nbsp;| &nbsp;")<a target="_blank" href="https://site.com.br/lgpd/">LGPD</a>
+        @if (!String.IsNullOrEmpty(Program.Config.faleConoscoUrl)) {
+          @Html.Raw(" &nbsp;| &nbsp;")<a target="_blank" href="@Program.Config.faleConoscoUrl">Fale Conosco</a>
+        }
+      </div>
+      <iframe hidden="hidden" style="opacity: 0; height: 1px;" id="rl" src="@Url.Action("Reloading", "Pagina")"></iframe>
+      <script>
+        function rmRl() {
+          document.getElementById("rl").remove();
+        }
+        setTimeout(rmRl, 3600000);
+
+        /* Ajustar vídeos para responsivo */
+        var videoCurso = document.getElementsByClassName("video-curso");
+        function verSizeVideoHome() {
+          for (v = 0; v < videoCurso.length; v++) {
+
+            if (window.innerWidth < 576) {
+              videoCurso[v].width = (window.innerWidth - 300);
+            } if (window.innerWidth < 768) {
+              videoCurso[v].width = (window.innerWidth - (window.innerWidth / 100 * 30));
+            } else {
+              videoCurso[v].width = 520;
+            }
+          }
+        }
+
+        if (videoCurso != undefined) {
+          window.addEventListener('resize', verSizeVideoHome);
+          window.addEventListener('load', verSizeVideoHome);
+        }
+
+        //Para funcionamento Select 2
+        $(document).ready(function () {
+          $('.select2').select2();
+        });
+
+      </script>
+
+      @await Html.PartialAsync("_Footer")
+</body>
+</html>

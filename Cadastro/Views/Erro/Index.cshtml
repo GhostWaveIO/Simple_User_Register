@@ -1,0 +1,26 @@
+﻿@model List<ErroFile>
+
+@using Cadastro.Models.Services.Application.Logs
+@{
+    ViewData["Title"] = "Lista de Erros";
+}
+
+<h3 class="text-center mt-3">Lista de Erros</h3>
+
+@foreach (ErroFile e in Model) {
+    <div class="container my-3 border border-danger py-3">
+        <h5 class="text-center">@Html.Raw(e.Titulo)</h5>
+        <p class="mb-3 text-center">
+            @String.Format("{3}:{4} - {0}/{1}/{2}",
+        e.Criado.Day, e.Criado.Month, e.Criado.Year,
+        e.Criado.Hour, e.Criado.Minute, e.Criado.Second
+        )
+        </p>
+        <p class="text-center text-justify">@Html.Raw(e.Conteudo)</p>
+
+    </div>
+}
+
+@if (Model.Count() == 0) {
+    <p class="text-center text-success mt-5">Nenhum Erro foi encontrado :)</p>
+}

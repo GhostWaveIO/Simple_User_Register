@@ -1,0 +1,323 @@
+﻿@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts;
+@model Cadastro.Models.ViewModel.Application.Security.Permissions.HierarquiaServiceVM
+@{
+    ViewData["Title"] = "Editar Permissão";
+    AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+    string msgResult = (string)ViewData["msgResult"];
+}
+
+
+<div class="container">
+    @Html.Raw(AlertMessage.GetMessage(msgResult))
+
+    <h4 class="text-center mt-3 mb-5">Editar Permissão</h4>
+
+    <form class="container" asp-action="EditarHierarquia" method="post">
+
+
+        <div class="row">
+            <div class="col-12 col-md-3"></div>
+            <div class="col-12 col-md-6">
+
+                <input hidden="hidden" type="number" asp-for="hierarquia.HierarquiaId" value="@Model.hierarquia.HierarquiaId" />
+
+                <!-- Título da permissão -->
+                <div class="form-group">
+                    <label asp-for="hierarquia.Titulo">Título</label>
+                    <input class="form-control" type="text" asp-for="hierarquia.Titulo" value="@Model.hierarquia.Titulo" />
+                    <span asp-validation-for="hierarquia.Titulo" class="text-danger"></span>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="Apagar" value="true" />
+                    <label class="text-danger form-check-label" asp-for="Apagar">Remover Esta Permissão</label>
+                </div>
+
+            </div>
+            <div class="col-12 col-md-3"></div>
+        </div>
+        <hr />
+
+        <div id="permissoes">
+
+            @*//////////////////////////////////////////////////////////////////*@
+            <h4 class="text-center mb-3">Permissões</h4>
+            <h5 class="my-3">Home</h5>
+
+            <!-- #### Permissões #### -->
+            <!-- Home -->
+            <div class="row">
+                <input hidden="hidden" type="number" asp-for="permissao.PermissaoHierarquiaId" value="@Model.hierarquia.PermissaoHierarquia?.PermissaoHierarquiaId" />
+                <input hidden="hidden" type="number" asp-for="permissao.HierarquiaId" value="@Model.hierarquia.PermissaoHierarquia?.HierarquiaId" />
+
+                <div hidden="hidden" class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.UltimosEventos, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.UltimosEventos, "Acesso a Útimos Eventos", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ContagemUsuarios, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ContagemUsuarios, "Acesso a Contagem de Usuários", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome, "Conteúdo da Home 1", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome2, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome2, "Conteúdo da Home 2", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome3, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome3, "Conteúdo da Home 3", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome4, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome4, "Conteúdo da Home 4", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome5, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome5, "Conteúdo da Home 5", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome6, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome6, "Conteúdo da Home 6", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome7, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome7, "Conteúdo da Home 7", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome8, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome8, "Conteúdo da Home 8", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome9, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome9, "Conteúdo da Home 9", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome10, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome10, "Conteúdo da Home 10", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome11, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome11, "Conteúdo da Home 11", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome12, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome12, "Conteúdo da Home 12", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome13, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome13, "Conteúdo da Home 13", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome14, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome14, "Conteúdo da Home 14", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome15, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome15, "Conteúdo da Home 15", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome16, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome16, "Conteúdo da Home 16", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome17, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome17, "Conteúdo da Home 17", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome18, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome18, "Conteúdo da Home 18", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome19, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome19, "Conteúdo da Home 19", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome20, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ConteudoHome20, "Conteúdo da Home 20", new { @class = "form-check-label" })
+                </div>
+            </div>
+
+            <!-- Usuários -->
+            <h5 class="mt-5 mb-3">Acesso a Outros Usuários</h5>
+            <div class="row">
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.PesquisarUsuarios, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.PesquisarUsuarios, "Pesquisar Usuários", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.VisualizarDadosUsuarios, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.VisualizarDadosUsuarios, "Acessar Dados de Todos", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.EditarDadosUsuarios, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.EditarDadosUsuarios, "Editar Dados de Todos", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.EditarHierarquiaUsuario, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.EditarHierarquiaUsuario, "Editar Permissão de Todos", new { @class = "form-check-label" })
+                </div>
+
+                <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.DarFuncoesUsuarios, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.DarFuncoesUsuarios, "Dar Permissões a Qualquer Usuário", new { @class = "form-check-label" })
+                </div>
+
+                <div hidden="hidden" class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                    @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ApagarUsuario, new { @class = "form-check-input" })
+                    @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ApagarUsuario, "Remover Qualquer Usuário", new { @class = "form-check-label" })
+                </div>
+            </div>
+
+            @if (acesso.IsAdmin()) {
+                <!-- Estrutura de Cadastro -->
+                <h5 class="mt-5 mb-3">Estrutura de Cadastro</h5>
+                <div class="row permissao-onlyadmin">
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.CriarGrupoCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.CriarGrupoCadastro, "Criar Grupos", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.EditarGrupoCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.EditarGrupoCadastro, "Editar Grupos", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.RemoverGrupoCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.RemoverGrupoCadastro, "Remover Grupos", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.CriarLinhaCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.CriarLinhaCadastro, "Criar Linhas", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.EditarLinhaCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.EditarLinhaCadastro, "Editar Linhas", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.RemoverLinhaCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.RemoverLinhaCadastro, "Remover Linhas", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.CriarCampoCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.CriarCampoCadastro, "Criar Campos", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.EditarCampoGenericoCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.EditarCampoGenericoCadastro, "Editar Campos Genéricos", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.EditarCampoPersonalizadoCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.EditarCampoPersonalizadoCadastro, "Editar Campos Personalizados", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.RemoverCampoCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.RemoverCampoCadastro, "Remover Campos", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.VisualizarEstruturaCadastro, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.VisualizarEstruturaCadastro, "Visualizar Estrutura de Cadastro", new { @class = "form-check-label" })
+                    </div>
+                </div>
+            }
+
+
+
+
+            @if (acesso._usuario.IsAdmin()) {
+                <!-- Configurações -->
+                <h5 class="mt-5 mb-3">Configurações</h5>
+                <div class="row permissao-onlyadmin">
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.ManipularHierarquias, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.ManipularHierarquias, "Criar/Editar Permissões", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.VerBotaoSuporte, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.VerBotaoSuporte, "Ícone Suporte", new { @class = "form-check-label" })
+                    </div>
+
+                    @*Permite somente Admin de alterar as permissões daquele usuário*@
+                    <div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                        @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.SomenteAdminPrincipal, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.SomenteAdminPrincipal, "Acesso Somente Admin", new { @class = "form-check-label font-weight-bold" })
+                    </div>
+                </div>
+            }
+
+
+            <!-- Outros -->
+            <h5 hidden="hidden" class="mt-5 mb-3">Outros</h5>
+            <div hidden="hidden" class="row">
+                @*<div class="form-check mb-3 col-12 col-md-6 col-xl-4">
+                @Html.CheckBoxFor(m => m.hierarquia.PermissaoHierarquia.AcessoTotal, new { @class = "form-check-input" })
+                @Html.LabelFor(m => m.hierarquia.PermissaoHierarquia.AcessoTotal, "Acesso Total (Todas Permissões Acima)", new { @class = "form-check-label" })
+                </div>*@
+            </div>
+
+        </div>
+
+        <p class="mt-5">
+            <button class="btn btn-success">Salvar Alterações</button>
+            <button type="button" class="btn btn-primary" onclick="ckeckAllPermissions()">Selecionar Todos</button>
+            <button type="button" class="btn btn-warning" onclick="unckeckAllPermissions()">Remover Seleção</button>
+            <a asp-action="Index" asp-controller="Configuracao" class="btn btn-outline-secondary">Voltar</a>
+        </p>
+    </form>
+
+
+    <script>
+        var checks = document.getElementById("permissoes").querySelectorAll("input[type='checkbox']");
+
+        function ckeckAllPermissions() {
+
+            for (var ch = 0; ch < checks.length; ch++) {
+                checks[ch].checked = true;
+            }
+        }
+
+        function unckeckAllPermissions() {
+
+            for (var ch = 0; ch < checks.length; ch++) {
+                checks[ch].checked = false;
+            }
+        }
+    </script>
+</div>

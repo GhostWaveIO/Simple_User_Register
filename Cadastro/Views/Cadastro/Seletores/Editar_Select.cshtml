@@ -1,0 +1,44 @@
+﻿@model CriarSelectCadastroVM
+@using Cadastro.Models.ViewModel.Account.Cadastro.Seletores;
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts;
+
+@{
+  ViewData["Title"] = "Editar Opção";
+  string msgResult = (string)ViewData["msgResult"];
+}
+
+@Html.Raw(AlertMessage.GetMessage(msgResult))
+
+<h4 class="text-center mt-3 mb-5">@ViewData["Title"]</h4>
+
+<form asp-action="Editar_Select" asp-controller="SeletoresCadastro" method="post">
+  <div class="row">
+    <div class="col-0 col-lg-2"></div>
+    <div class="col-12 col-lg-8">
+    @Html.HiddenFor(m => m.select.Select_ItemId)
+
+      @* Nome *@
+      <div class="form-group">
+        @Html.LabelFor(m => m.select.Nome)
+        @Html.TextBoxFor(m => m.select.Nome, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.select.Nome, "", new { @class = "text-danger" })
+      </div>
+
+      @* Ordem *@
+      <div class="form-group">
+        @Html.LabelFor(m => m.select.Ordem)
+        @Html.TextBoxFor(m => m.select.Ordem, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.select.Ordem, "", new { @class = "text-danger" })
+      </div>
+
+      <p class="mt-5">
+        <input class="btn btn-success" type="submit" value="Salvar Alterações" />
+        <a asp-action="EditarCampo" asp-controller="Cadastro" asp-route-id="@Model.select.Campo_CadastroId" class="btn btn-outline-secondary">Voltar</a>
+      </p>
+      
+
+    </div>
+    <div class="col-0 col-lg-2"></div>
+  </div>
+</form>
+

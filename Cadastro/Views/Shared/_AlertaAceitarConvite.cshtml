@@ -1,0 +1,14 @@
+﻿
+@*
+<!-- Aceitar -->
+@foreach(ConviteHierarquia c in ((AcessoService)ViewData["acesso"])._convites) {
+  if(c?.Recrutador != null) {
+    <p class="alert alert-info text-center">
+      Você recebeu um convite para participar da equipe do @c.Recrutador.GetNomeCompleto
+      <a class="btn btn-sm btn-success ml-md-4 d-block d-md-inline my-2 my-md-0" asp-controller="Equipe" asp-action="AceitarConvite" asp-route-id="@c.ConviteHierarquiaId" asp-route-a="@true">Aceitar</a>
+      <a class="btn btn-sm btn-danger d-block d-md-inline" asp-controller="Equipe" asp-action="AceitarConvite" asp-route-id="@c.ConviteHierarquiaId">Ignorar</a>
+    </p>
+  }
+
+}
+*@

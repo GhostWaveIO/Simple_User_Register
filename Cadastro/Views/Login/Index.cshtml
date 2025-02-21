@@ -1,0 +1,56 @@
+﻿@using Cadastro.Models.ViewModel.Account;
+@using Cadastro.Models.ViewModel.Application.Notifications.Alerts;
+@model UsuarioVM
+@{
+  ViewData["Title"] = "Login";
+  string msgResult = (string)ViewData["msgResult"];
+}
+
+<section class="container">
+  <!-- Alert Message -->
+  @Html.Raw(AlertMessage.GetMessage(msgResult))
+  <div class="row">
+    <div class="col-0 col-md-3 col-xl-4"></div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+
+
+      <div id="caixaLogin" class="border rounded-lg p-3 mt-5 mb-3">
+
+        <h3 class="text-center mb-4">Acesso ao Painel</h3>
+
+        <form asp-action="ValidarLogin" method="post">
+          <span class="font-italic"></span>
+
+          <div class="form-group">
+            @Html.HiddenFor(m => m.usuario.Dados[0].Campo.CampoGenerico)
+            <label asp-for="usuario.Dados[0].Email">E-mail de Acesso</label>
+            <input minlength="3" asp-for="usuario.Dados[0].Email" class="form-control">
+            <span asp-validation-for="usuario.Dados[0].Email" class="text-danger"></span>
+          </div>
+
+          <div class="form-group mb-0">
+            @Html.HiddenFor(m => m.usuario.Dados[1].Campo.CampoGenerico)
+            <label asp-for="usuario.Dados[1].Senha">Senha de Acesso</label>
+            <input type="password" asp-for="usuario.Dados[1].Senha" class="form-control">
+            <span asp-validation-for="usuario.Dados[1].Senha" class="text-danger"></span>
+          </div>
+
+          <br><button type="submit" class="btn btn-primary d-block float-left">Efetuar Login</button>
+
+
+          <small class="text-right d-block float-right">
+            <a asp-controller="Cadastro" asp-action="Index">Criar Conta</a><br>
+            <a class="text-right" asp-controller="Recuperacao" asp-action="RecuperarSenha">Recuperar Senha</a>
+          </small>
+          <div style="clear: both;"></div>
+        </form>
+
+      </div>
+    </div>
+
+
+    <div class="col-0 col-md-3 col-xl-4"></div>
+  </div>
+
+  </section>

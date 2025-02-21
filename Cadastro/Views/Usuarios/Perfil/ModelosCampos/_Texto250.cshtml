@@ -1,0 +1,44 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+
+@{
+    AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+
+    List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+    int g = (int)ViewData["g"];
+    int l = (int)ViewData["l"];
+    int c = (int)ViewData["c"];
+    Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+
+    string colsBootstrap = String.Format(
+      "{0}{1}{2}{3}{4}",
+      (campo.ColunasXS_Perfil == 0 ? $" col-{campo.ColunasXS_Cadastro}" : $" col-{campo.ColunasXS_Perfil}"),
+      (campo.ColunasSM_Perfil == 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : $" col-sm-{campo.ColunasSM_Perfil}"),
+      (campo.ColunasMD_Perfil == 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : $" col-md-{campo.ColunasMD_Perfil}"),
+      (campo.ColunasLG_Perfil == 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : $" col-lg-{campo.ColunasLG_Perfil}"),
+      (campo.ColunasXL_Perfil == 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : $" col-xl-{campo.ColunasXL_Perfil}")
+    );
+    bool autorizadoEditar = await campo.Dados[0].VerificarAutorizacaoEdicao(Model.usuario, acesso);
+}
+
+
+<div class="@colsBootstrap form-group">
+  @if (campo.CampoGenerico == ECampoGenerico.CPF) {
+    @Html.HiddenFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Texto250)
+    <input hidden="hidden" asp-for="grupos[0].Linhas[0].Campos[0].Dados[0].Dado_CadastroId_Cpf" value="@campo.Dados[0].Dado_CadastroId">
+    <label asp-for="grupos[0].Linhas[0].Campos[0].Dados[0].Cpf_Generico" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+    <input asp-for="grupos[0].Linhas[0].Campos[0].Dados[0].Cpf_Generico" class="form-control@(autorizadoEditar?"":" disabled")" type="text" placeholder="@campo.PlaceHolder" value="@Model.grupos[g].Linhas[l].Campos[c].Dados[0].Texto250" />
+    @Html.ValidationMessageFor(m => m.grupos[0].Linhas[0].Campos[0].Dados[0].Cpf_Generico, "", new { @class = "text-danger" })
+  } else if (campo.Required) {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Texto250_Required" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+    <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Texto250_Required" class="form-control@(autorizadoEditar?"":" disabled")" type="text" data-val-length="Máximo @campo.ComprimentoTextoMax caracteres" data-val-length-min="1" data-val-length-max="@campo.ComprimentoTextoMax" placeholder="@campo.PlaceHolder" value="@Model.grupos[g].Linhas[l].Campos[c].Dados[0].Texto250" />
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Texto250_Required, "", new { @class = "text-danger" })
+  } else {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Texto250" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label</label>
+    <input asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Texto250" class="form-control@(autorizadoEditar?"":" disabled")" type="text" data-val-length="Máximo @campo.ComprimentoTextoMax caracteres" data-val-length-min="0" data-val-length-max="@campo.ComprimentoTextoMax" placeholder="@campo.PlaceHolder" value="@Model.grupos[g].Linhas[l].Campos[c].Dados[0].Texto250" />
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Texto250, "", new { @class = "text-danger" })
+  }
+</div>

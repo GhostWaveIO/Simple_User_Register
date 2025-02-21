@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @Program.Config.nomeSistema</title>
+    <meta name="author" content="SUR">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/Imagens/icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="~/Imagens/icon180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/Imagens/icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/Imagens/icon.png">
+    <link rel="manifest" href="~/webmanifest.json">
+    <link rel="mask-icon" href="~/Imagens/icon.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/NoMenu/Header.css" />
+
+    <script src="~/lib/jquery/dist/jquery-3.6.0.min.js"></script>
+    <script src="~/lib/jquery-validation/1.19.3/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
+    <script src="~/lib/jquery-maskmoney/jquery.maskMoney.min.js"></script>
+
+
+    <script>
+        //Reconhecer vírgula na validação da valores monetários
+        $.validator.methods.range = function (value, element, param) {
+            var globalizedValue = value.replace(".", "");
+            globalizedValue = globalizedValue.replace(",", ".");
+            return this.optional(element) ||
+                (globalizedValue >= param[0] &&
+                    globalizedValue <= param[1]);
+        };
+
+        $.validator.methods.number = function (value, element) {
+            return this.optional(element) ||
+                /^-?(?:\d+|\d{1,3}(?:[\s\.,]\d{3})+)(?:[\.,]\d+)?$/
+                    .test(value);
+        };
+    </script>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <style>
+        /* Cabeçalho */
+
+        .bg-mainMenu {
+            background-color: @Program.Config.corMenu["bg"];
+        }
+
+            .bg-mainMenu .navbar-brand {
+                color: @Program.Config.corMenu["title"];
+            }
+
+                .bg-mainMenu .navbar-brand:hover {
+                    color: @Program.Config.corMenu["titleHover"];
+                }
+
+            .bg-mainMenu .navbar-toggler {
+                border: 2px solid @Program.Config.corMenu["iconeDropMenuBorda"];
+            }
+
+            .bg-mainMenu .navbar-toggler-icon {
+                color: @Program.Config.corMenu["iconeDropMenu"];
+            }
+
+            .bg-mainMenu .navbar-collapse .nav-link {
+                color: @Program.Config.corMenu["item"];
+            }
+
+                .bg-mainMenu .navbar-collapse .nav-link:hover {
+                    color: @Program.Config.corMenu["itemHover"];
+                }
+    </style>
+
+    <!-- Botão Check -->
+    <style>
+        .checkbox label:after,
+        .radio label:after {
+            content: '';
+            display: table;
+            clear: both;
+        }
+
+        .checkbox .cr,
+        .radio .cr {
+            position: relative;
+            display: inline-block;
+            border: 1px solid #a9a9a9;
+            border-radius: .25em;
+            width: 1.3em;
+            height: 1.3em;
+            float: left;
+            margin-right: .5em;
+        }
+
+        .radio .cr {
+            border-radius: 50%;
+        }
+
+            .checkbox .cr .cr-icon,
+            .radio .cr .cr-icon {
+                position: absolute;
+                font-size: .8em;
+                line-height: 0;
+                top: 50%;
+                left: 20%;
+            }
+
+            .radio .cr .cr-icon {
+                margin-left: 0.04em;
+            }
+
+        .checkbox label input[type="checkbox"],
+        .radio label input[type="radio"] {
+            display: none;
+        }
+
+            .checkbox label input[type="checkbox"] + .cr > .cr-icon,
+            .radio label input[type="radio"] + .cr > .cr-icon {
+                transform: scale(3) rotateZ(-20deg);
+                opacity: 0;
+                transition: all .3s ease-in;
+            }
+
+            .checkbox label input[type="checkbox"]:checked + .cr > .cr-icon,
+            .radio label input[type="radio"]:checked + .cr > .cr-icon {
+                transform: scale(1) rotateZ(0deg);
+                opacity: 1;
+            }
+
+            .checkbox label input[type="checkbox"]:disabled + .cr,
+            .radio label input[type="radio"]:disabled + .cr {
+                opacity: .5;
+            }
+    </style>
+
+    <link rel="stylesheet" href="~/css/NoMenu/footer.css" type="text/css" />
+    <style>
+        /*Rodapé*/
+
+        footer {
+            background: @Program.Config.corRodape["bg"];
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+            padding: 0;
+        }
+
+        footer #footer1 {
+            background: @Program.Config.corRodape["bg"];
+            width: 100%;
+            box-sizing: border-box;
+            color: @Program.Config.corRodape["texto"];
+            font-size: 11pt;
+        }
+
+        footer #footer2 {
+            background: #ffaa00;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 11pt;
+            font-weight: bold;
+        }
+    </style>
+
+    <!-- select 2 -->
+    <link href="~/lib/form/select2/css/select2.css" rel="stylesheet" />
+    <script src="/lib/form/select2/js/select2.min.js"></script>
+
+
+
+    @ViewData["css"]
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script>
+    <script src="/js/Conta/Cadastro/show-hidden-password.js"></script>
+
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header id="cabMain">
+        <div class="navbar navbar-expand-md bg-mainMenu">
+            <div class="container">
+                <a class="navbar-brand h1 mb-1 d-none d-sm-block" href="@Url.Action("Index", "Login")">@Program.Config.nomeSistema</a>
+                <a class="navbar-brand h1 mb-1 d-sm-none" href="@Url.Action("Index", "Login")"><small>@Program.Config.nomeSistema</small></a>
+                <button class="navbar-toggler d-none" data-toggle="collapse" data-target="#cabInfo">
+                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14 navbar-toggler-icon" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg>
+                </button>
+                <div class="collapse navbar-collapse border-0" id="cabInfo">
+                    <ul class="navbar-nav mr-auto"></ul>
+
+                    <ul class="navbar-nav">
+                        @*<li class="nav-item font-weight-bold">
+
+                        <!-- Verifica se fone foi informado e caso tenha sido, o adiciona -->
+                        @if(Config.foneUrl != "") {
+                        <a href="@Program.Config.foneUrl" target="_blank" class="nav-link">
+                        @Program.Config.fone
+                        <svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="whatsapp" class="svg-inline--fa fa-whatsapp fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path></svg>
+                        </a>
+                        } else {
+                        <div class="nav-link">
+                        @Program.Config.fone
+                        <svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="whatsapp" class="svg-inline--fa fa-whatsapp fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path></svg>
+                        </div>
+                        }
+
+                        </li>*@
+                        <li class="nav-item font-weight-bold">
+
+                            @*Verifica se FaleConosco foi informado e caso tenha sido, o adiciona*@
+                            @if (!String.IsNullOrEmpty(Program.Config.fone) && !String.IsNullOrEmpty(Program.Config.foneUrl)) {
+                                <a href="@Program.Config.foneUrl" target="_blank" class="nav-link">
+                                    @Program.Config.fone
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="whatsapp" class="svg-inline--fa fa-whatsapp fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path></svg>
+                                </a>
+                            } else if (!String.IsNullOrEmpty(Program.Config.fone)) {
+                                <span class="nav-link">
+                                    @Program.Config.fone
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="whatsapp" class="svg-inline--fa fa-whatsapp fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"></path></svg>
+                                </span>
+                            }
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div>
+            <img id="logo" class="d-block mt-3 mb-4 mx-auto px-4 px-md-0 img-fluid" src="~/Imagens/logo.png" alt="@Program.Config.nomeSistema" title="@Program.Config.nomeSistema">
+        </div>
+    </header>
+
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+
+    <p class="text-center mt-5">
+        <a target="_self" asp-action="Index" asp-controller="Login">Início</a>
+        @if (!String.IsNullOrEmpty(Program.Config.urlSite)) {
+            @Html.Raw(" &nbsp;| &nbsp;")
+
+            <a target="_blank" href="@Program.Config.urlSite">Visitar Site</a>
+        }
+        @Html.Raw(" &nbsp;| &nbsp;")<a target="_blank" href="https://site.com.br/lgpd/">LGPD</a>
+        @if (!String.IsNullOrEmpty(Program.Config.faleConoscoUrl)) {
+            @Html.Raw(" &nbsp;| &nbsp;")
+
+            <a target="_blank" href="@Program.Config.faleConoscoUrl">Fale Conosco</a>
+        }
+    </p>
+
+    @await Html.PartialAsync("_Footer")
+
+    <script>
+
+        //Para funcionamento Select 2
+        $(document).ready(function () {
+            $('.select2').select2();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+﻿@using Cadastro.Models.ViewModel.Application.Notifications.Alerts
+@using Cadastro.Models.ViewModel.Application.Settings.Configurations;
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@model ConfiguracaoVM
+
+@{
+  ViewData["Title"] = "Configurações";
+  string msgResult = (string)ViewData["msgResult"];
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+}
+<!-- Alert Message -->
+@Html.Raw(AlertMessage.GetMessage(msgResult))
+
+
+<div class="container">
+  <h3 class="text-center mt-3 mb-5">Configurações</h3>
+
+  <!-- /.col -->
+  <div>
+    <div class="card">
+      <div class="card-header p-2">
+        <ul class="nav nav-pills">
+          @*<li class="nav-item"><a class="nav-link" href="#acesso" data-toggle="tab">Dados de Acesso</a></li>*@
+          @if (acesso._permissao.AnyEstruturaCadastro()) {
+            <li class="nav-item"><a class="nav-link active" href="#cadastro" data-toggle="tab">Estrutura de Cadastro</a></li>
+          }
+          @if (acesso._permissao.ManipularHierarquias) {
+            <li class="nav-item"><a class="nav-link@(!acesso._permissao.AnyEstruturaCadastro()?" active":"")" href="#funcoes" data-toggle="tab">Permissões</a></li>
+          }
+        </ul>
+      </div><!-- /.card-header -->
+      <div class="card-body">
+        <div class="tab-content">
+
+          @*<!-- Dados de Acesso -->
+            @await Html.PartialAsync("Abas/_DadosDeAcesso.cshtml")*@
+
+          @if (acesso._permissao.AnyEstruturaCadastro()) {
+            <!-- Informações -->
+            @await Html.PartialAsync("Abas/_Cadastro.cshtml")
+          }
+
+          @if (acesso._permissao.ManipularHierarquias) {
+            <!-- Dados Pesoais -->
+            @await Html.PartialAsync("Abas/_Funcoes.cshtml")
+          }
+
+        </div>
+        <!-- /.tab-content -->
+      </div><!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </div>
+  <!-- /.col -->
+
+
+  <p class="text-right text-muted mt-0"><small>Versão: @Program.Config.Versao</small></p>
+</div>

@@ -1,0 +1,42 @@
+﻿@model CadastroUsuarioVM
+@using Cadastro.Models.Account.Cadastro.Campos
+@using Cadastro.Models.Entities.DB.Account.Form
+@using Cadastro.Models.ViewModel.Application.AccessContext;
+@using Cadastro.Models.Entities.DB.Account.Form.Seletores;
+@using Cadastro.Models.ViewModel.Account.Cadastro;
+
+@{
+  AcessoServiceVM acesso = (AcessoServiceVM)ViewData["acesso"];
+  List<Grupo_Cadastro> grupos = (List<Grupo_Cadastro>)ViewData["grupos"];
+  int g = (int)ViewData["g"];
+  int l = (int)ViewData["l"];
+  int c = (int)ViewData["c"];
+  Campo_Cadastro campo = grupos[g].Linhas[l].Campos[c];
+  List<Select_Item> listaOptions = Model.grupos[g].Linhas[l].Campos[c].Selects?.OrderBy(s => s.Ordem).ToList();
+  string selected = listaOptions.FirstOrDefault(l => l.PreSelecionado)?.Select_ItemId.ToString();
+  grupos[g].Linhas[l].Campos[c].Dados[0].Selected.Select_ItemId_Required = listaOptions.FirstOrDefault(l => l.PreSelecionado)?.Select_ItemId ?? 0;
+
+  SelectList SLOptions = new SelectList(listaOptions, "Select_ItemId", "Nome", selected);
+
+  string colsBootstrap = String.Format(
+    "{0}{1}{2}{3}{4}",
+    (campo.ColunasXS_Cadastro != 0 ? $" col-{campo.ColunasXS_Cadastro}" : ""),
+    (campo.ColunasSM_Cadastro != 0 ? $" col-sm-{campo.ColunasSM_Cadastro}" : ""),
+    (campo.ColunasMD_Cadastro != 0 ? $" col-md-{campo.ColunasMD_Cadastro}" : ""),
+    (campo.ColunasLG_Cadastro != 0 ? $" col-lg-{campo.ColunasLG_Cadastro}" : ""),
+    (campo.ColunasXL_Cadastro != 0 ? $" col-xl-{campo.ColunasXL_Cadastro}" : "")
+  );
+}
+
+
+<div class="@colsBootstrap form-group">
+  @if (campo.Required) {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Selected.Select_ItemId_Required" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label<span class="text-danger">*</span></label>
+    @Html.DropDownListFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Selected.Select_ItemId_Required, SLOptions, "Selecione uma opção", new { @class = "form-control select2" })
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Selected.Select_ItemId_Required, "", new { @class = "text-danger" })
+  } else {
+    <label asp-for="grupos[g].Linhas[l].Campos[c].Dados[0].Selected.Select_ItemId" class="@(String.IsNullOrEmpty(campo.Label)?" d-none":"")">@campo.Label</label>
+    @Html.DropDownListFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Selected.Select_ItemId, SLOptions, "Selecione uma opção", new { @class = "form-control select2" })
+    @Html.ValidationMessageFor(m => m.grupos[g].Linhas[l].Campos[c].Dados[0].Selected.Select_ItemId, "", new { @class = "text-danger" })
+  }
+</div>
