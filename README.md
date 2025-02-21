@@ -19,13 +19,16 @@ Antes de iniciar, siga os passos abaixo:
    - Local do arquivo: `/StaticFiles/internal/settings/general.json`
    - Configure esse arquivo antes de prosseguir.
 
-4. **Execute o migrations na pasta do projeto:**
+4. **Configure o email SMTP** para confirmação de emails, recuperação de senhas, etc.
+   - As configurações devem ser feitas no arquivo de configuração `general.json` que foi gerado.
+
+5. **Execute o migrations:**
    ```sh
-   dotnet ef migrations add first
+   dotnet ef migrations add "first"
    dotnet ef database update
    ```
 
-5. **Crie a estrutura de cadastro e o usuário administrador:**
+6. **Crie a estrutura de cadastro e o usuário administrador:**
    - Acesse a URL:
      ```
      http://localhost:xxx/Login/CorrecaoGeral
@@ -77,19 +80,23 @@ O sistema conta com um local dedicado para pesquisar usuários cadastrados.
 ## 🌟 Capturas de Tela
 
 1. **Tela de Login**
+![Image](https://github.com/user-attachments/assets/e12e0a9f-2338-4e4c-8cee-17b4b97c38d7)
    
 2. **Tela Home** (Exibe as homes configuradas para cada usuário)
+![Image](https://github.com/user-attachments/assets/422d5638-d856-4d5b-8201-88cff6d2ca90)
    
 3. **Editor de Formulário** (Personalização de grupos, linhas e campos)
+![Image](https://github.com/user-attachments/assets/f4572677-a8f1-410b-bc26-b60c4f5f732a)
    
-4. **Gerenciamento de Permissões**
+4. **Gerenciamento de Permissões** (Define quem pode acessar cada Home)
+![Image](https://github.com/user-attachments/assets/bf65da96-0124-4692-994d-6d725417f97c)
 
 ## 💪 Contribuição
 Sinta-se à vontade para contribuir com melhorias!
 
 1. **Clone o repositório:**
    ```sh
-   git clone https://github.com/GhostWaveIO/Simple_User_Register.git
+   git clone https://github.com/seu-usuario/SUR.git
    ```
 2. **Crie uma branch:**
    ```sh
@@ -106,5 +113,5 @@ Sinta-se à vontade para contribuir com melhorias!
 5. **Abra um Pull Request!**
 
 ---
-Feito com ❤️ por [GhostWaveIO](https://github.com/GhostWaveIO).
+Feito com ❤️ por [GostWaveIO](https://github.com/GhostWaveIO).
 
