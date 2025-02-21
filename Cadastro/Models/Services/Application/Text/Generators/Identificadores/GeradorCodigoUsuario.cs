@@ -27,10 +27,12 @@ namespace Cadastro.Models.Services.Application.Text.Generators.Identificadores
                   chars[rand.Next(chars.Length - 1)],
                   chars[rand.Next(chars.Length - 1)],
                   chars[rand.Next(chars.Length - 1)],
+                  chars[rand.Next(chars.Length - 1)],
+                  chars[rand.Next(chars.Length - 1)],
                   chars[rand.Next(chars.Length - 1)]
                 );
 
-                res = $"{divEstado[0]}{codigoUsuario}{divEstado[1]}";
+                res = $"{codigoUsuario}";
             } while (await context.Usuarios?.AnyAsync(u => u.CodigoUsuario == res));
 
             return res;
