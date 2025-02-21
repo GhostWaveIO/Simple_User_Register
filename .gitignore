@@ -8,4 +8,4 @@ Cadastro/appsettings.json
 Cadastro/StaticFiles/wwwroot/webmanifest.json
 Cadastro/StaticFiles/wwwroot/dbFile/*
 Cadastro/StaticFiles/wwwroot/Files/*
-Cadastro/StaticFiles/wwwroot/internal/settings/*
+Cadastro/StaticFiles/internal/settings/*
